@@ -8,6 +8,7 @@
     "type": "module"
   },
   "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://summarizer-api-seven.vercel.app/*"],
   "commands": {
     "summarize-page": {
       "suggested_key": {
