@@ -1,35 +1,13 @@
-// This script is a placeholder for further enhacements
+/*
+
+This script is where all of the app's main functionality is held
+It listens for keyboard commands and clicks to determine what the user
+wants to do.
+It relies on several functions/classes from other files
+
+*/
+
 console.log("Content.js Script injected into tab");
-
-// Summarizes the content of a webpage
-async function summarizeContent() {
-            const response = await fetch('https://summary-chrome-extension-backend.onrender.com/', {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(document.body.innerText)
-            })
-
-            const data = await response.json();
-            
-            summarizedContent = data.summary;
-            
-            return data.summary;
-}
-
-// Converts given text to speech
-function textToSpeech(givenText) {
-    const utterance = new SpeechSynthesisUtterance(givenText);
-    window.speechSynthesis.speak(utterance);
-}
-
-// Stops screen reader
-function stopScreenreader() {
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(new SpeechSynthesisUtterance("Canceling Screen reader"));
-    screenReaderActive = false;
-}
 
 // Summarized Content
 let summarizedContent = "";
@@ -45,26 +23,28 @@ summarizeContent().then((result) => {
 });
 
 document.addEventListener("keydown", (event) => {
-    
-    if(event.key === "Control") {
-        if(screenReaderActive) {
+    if (event.key === "Control") {
+        if (screenReaderActive) {
             stopScreenreader();
-            timesControlPressed = 0
+            timesControlPressed = 0;
         } else {
             timesControlPressed++;
+
+            // Resets times pressed if they don't press again in 1.5 seconds
+            if (timesControlPressed == 1) {
+                setTimeout(() => {
+                    timesControlPressed = 0;
+                }, 1500);
+            }
         }
     }
 
     if (timesControlPressed === 3) {
-        
-        if(!screenReaderActive) {
+        if (!screenReaderActive) {
             textToSpeech(summarizedContent);
             screenReaderActive = true;
         }
-
     }
 
     console.log(timesControlPressed, screenReaderActive, event.key); // Debugging
-
-
-})
+});

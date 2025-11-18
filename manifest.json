@@ -20,7 +20,12 @@
   },
   "content_scripts" : [
     {
-      "js" : ["scripts/content.js"],
+      "js" : 
+      [
+      "scripts/screenReader.js",
+      "scripts/summarize.js", 
+      "scripts/content.js"
+      ],
       "matches" : ["<all_urls>"]
     }
   ]
