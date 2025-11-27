@@ -7,7 +7,7 @@
     "service_worker": "scripts/service-worker.js",
     "type": "module"
   },
-  "permissions": ["activeTab", "scripting", "tts"],
+  "permissions": ["activeTab", "scripting", "tts", "tabs"],
   "host_permissions": ["https://summarizer-api-seven.vercel.app/*"],
   "commands": {
     "summarize-page": {
@@ -24,7 +24,8 @@
       [
       "scripts/screenReader.js",
       "scripts/summarize.js", 
-      "scripts/content.js"
+      "scripts/content.js",
+      "scripts/agentFunctions.js"
       ],
       "matches" : ["<all_urls>"]
     }
