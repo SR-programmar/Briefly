@@ -29,7 +29,9 @@ async function sendMessageToWorker(msg) {
     return response;
 }
 
-// Summarizes the content of a webpage
+/* Makes a call to the Python server which sends back a summary
+of the webpage's content that a user is currently on.
+*/
 async function summarizeContent() {
     // Endpoint 1 - Weak extractive summarization to avoid rate limits
     const endpoint1 =
@@ -52,14 +54,16 @@ async function summarizeContent() {
 
     return response.summary;
 }
-
+/* Makes a call to the Python server which sends back a JSON formatted object
+as a response to the user's wish
+*/
 async function callAgent(sentences) {
     // API Endpoint
     const endpoint =
         "https://summary-chrome-extension-backend.onrender.com/agent-call";
 
     const response = await serverFetch(endpoint, { input: sentences });
-
+    console.log(response);
     // It returns an array so we must specify [0] to get the first object
     const json_response = JSON.parse(response.response)[0];
 

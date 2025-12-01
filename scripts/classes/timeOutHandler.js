@@ -36,7 +36,7 @@ class TimeOutHandler {
         }
     }
 
-    // Checks if the name actually exists
+    // Checks if the name actually exists in timeOuts
     checkName(name) {
         return name in this.timeOuts;
     }

@@ -37,6 +37,7 @@ async function startAIAgent() {
 
 // Played when AI Agent is cancelled and the user doesn't produce any noise
 function stopAIAgent() {
+    timeHandler.clearAllTime();
     playStopEffect();
     textToSpeech("Exiting AI Agent");
     recogniton.stop();
@@ -46,7 +47,6 @@ function stopAIAgent() {
 function afterSpeech() {
     callAgent(formattedSentences());
     timeHandler.clearAllTime();
-    sentences = [];
     textToSpeech("Thank you, please wait");
 }
 

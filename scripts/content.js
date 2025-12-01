@@ -39,6 +39,7 @@ document.addEventListener("keyup", () => {
 });
 
 document.addEventListener("keydown", (event) => {
+    // Checks if user holds down F2 for atleast 1 second to trigger Agent
     if (event.key === "F2") {
         if (!keyWasHeld) {
             startTime = new Date().getSeconds();
@@ -46,10 +47,12 @@ document.addEventListener("keydown", (event) => {
         }
     }
 
+    // Stop conversation with agent
     if (event.key === "Escape") {
         stopAIAgent();
     }
 
+    // Play Summarizer if Control is pressed 3 times
     if (event.key === "Control") {
         if (screenReaderActive) {
             stopScreenreader();
