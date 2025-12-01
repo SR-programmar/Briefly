@@ -32,7 +32,7 @@ async function sendMessageToWorker(msg) {
 /* Makes a call to the Python server which sends back a summary
 of the webpage's content that a user is currently on.
 */
-async function summarizeContent() {
+async function summarizeContent(summaryMode) {
     // Endpoint 1 - Weak extractive summarization to avoid rate limits
     const endpoint1 =
         "https://summary-chrome-extension-backend.onrender.com/simple-sum";
@@ -44,6 +44,7 @@ async function summarizeContent() {
     // Fetch from server
     const response = await serverFetch(endpoint1, {
         input: document.body.innerText,
+        mode: summaryMode,
     });
 
     // data.summary is the summary
@@ -67,10 +68,10 @@ async function callAgent(sentences) {
     // It returns an array so we must specify [0] to get the first object
     const json_response = JSON.parse(response.response)[0];
 
-    const idx = json_response.index;
-    const args = json_response.arguments;
+    const idx = json_response.index; // Function index
+    const args = json_response.arguments; // Arguments if function needs it
 
-    textToSpeech(json_response.agentResponse);
+    textToSpeech(json_response.agentResponse); // Agent's response
     if (idx > -1) {
         const functions = [navigateTo, openUrl, listTabs];
 
