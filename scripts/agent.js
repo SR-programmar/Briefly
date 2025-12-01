@@ -1,6 +1,7 @@
 // Variables
 let speechToTextResult;
 let sentences;
+let agentOn = false;
 
 let timeHandler = new TimeOutHandler("noResponse, finalResult, fallBack");
 
@@ -63,13 +64,12 @@ function formattedSentences() {
  * done speaking
  */
 recogniton.addEventListener("result", (event) => {
-    speechToTextResult = event.results;
+    speechToTextResult = event.results[event.results.length - 1];
 
     timeHandler.clearTime("noResponse");
     timeHandler.clearTime("finalResult");
 
     const text = Array.from(speechToTextResult)
-        .map((result) => result[0])
         .map((result) => result.transcript)
         .join("\n");
 

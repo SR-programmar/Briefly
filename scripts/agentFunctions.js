@@ -15,6 +15,13 @@ async function listTabs() {
     for (let i = 0; i < tabs.tabs.length; i++) {
         tabTitles.push(tabs.tabs[i].title);
     }
+
+    let tabsText = "";
+    for (let i = 0; i < tabTitles.length; i++) {
+        tabsText += `${i + 1}. ${tabTitles[i]}\n`;
+    }
+
+    textToSpeech("Here are all the tabs: " + tabsText);
 }
 
 document.addEventListener("keydown", async (event) => {

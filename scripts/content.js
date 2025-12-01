@@ -34,6 +34,8 @@ document.addEventListener("keyup", () => {
     startTime = undefined;
 
     if (timeHeld >= 1) {
+        console.log("F2 was held for", timeHeld, "seconds");
+        agentOn = true;
         startAIAgent();
     }
 });
@@ -48,8 +50,9 @@ document.addEventListener("keydown", (event) => {
     }
 
     // Stop conversation with agent
-    if (event.key === "Escape") {
+    if (event.key === "Escape" && agentOn) {
         stopAIAgent();
+        agentOn = false;
     }
 
     // Play Summarizer if Control is pressed 3 times
