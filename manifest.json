@@ -13,7 +13,8 @@
         "audioCapture",
         "tabs",
         "offscreen",
-        "sidePanel"
+        "sidePanel",
+        "storage"
     ],
     "host_permissions": ["https://*/"],
     "commands": {

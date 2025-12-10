@@ -4,12 +4,11 @@ chrome.commands.onCommand.addListener(async (command) => {
     if (command === "summarize-page") {
         // Prints message alerting that Ctrl+B has been pressed
         logMsg("Pressed Ctrl + B");
-        workerMessanger("sidePanel", { purpose: "start" });
     }
 });
 
 // This function is used to send messages and is only used within this scripts
-async function workerMessanger(target, data) {
+async function sendMessage(target, data) {
     if (target === "offScreen") {
         await setUpOffScreen();
     }
@@ -73,6 +72,28 @@ async function setUpOffScreen() {
     }
 
     await createOffScreenDoc(path);
+}
+
+// Creates session data
+function createSessionData() {
+    chrome.storage.session.set({ extensionActive: false }).then(() => {
+        console.log("Value was set");
+    });
+
+    chrome.storage.session.setAccessLevel({
+        accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS",
+    });
+}
+
+// Gets a specified session data by key
+function getSessionData(key) {
+    let theResult;
+    chrome.storage.session.get([key]).then((result) => {
+        console.log("Value is " + result.key);
+        theResult = result;
+    });
+
+    return theResult;
 }
 
 // Gets the current tab
@@ -142,3 +163,4 @@ function handleMessage(message, sender, sendResponse) {
 
 // Adds event listener
 chrome.runtime.onMessage.addListener(handleMessage);
+createSessionData();
