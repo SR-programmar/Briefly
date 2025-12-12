@@ -1,6 +1,6 @@
 {
-    "name": "Summary Master Extension",
-    "description": "This is an extension used to summarize webpages for visually impaired",
+    "name": "Blind Time",
+    "description": "An extension that assists the visually impaired by saving them time",
     "version": "1.0",
     "manifest_version": 3,
     "background": {
@@ -39,7 +39,6 @@
                 "scripts/classes/timeOutHandler.js",
                 "scripts/screenReader.js",
                 "scripts/audio.js",
-                "scripts/agent.js",
                 "scripts/requestServer.js",
                 "scripts/content.js",
                 "scripts/agentFunctions.js"

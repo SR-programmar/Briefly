@@ -1,4 +1,10 @@
 // Variables
+let microphoneAccess;
+
+getMicrophoneAcess().then((result) => {
+    microphoneAccess = result;
+});
+
 let speechToTextResult;
 let sentences;
 let agentOn = false;
@@ -21,7 +27,7 @@ function handleMessage(message, sender, sendResponse) {
         // Starts AI Agent conversation
         if (data.purpose === "startAgent") {
             console.log("Starting...");
-            startAIAgent();
+            setUpAgent();
         }
 
         // Stops AI Agent conversation
@@ -29,6 +35,29 @@ function handleMessage(message, sender, sendResponse) {
             console.log("Stopping...");
             stopAIAgent();
         }
+    }
+}
+/* ========================= Main Functions ================================== */
+
+function setUpAgent() {
+    if (!microphoneAccess) {
+        textToSpeech(
+            `You need to give blind time access to use your microphone,
+                I will open a new tab for you with a button that you can click to give permission`
+        );
+
+        screenReaderEnd(() => {
+            sendMessage("service-worker", {
+                purpose: "createNewTab",
+                url: "pages/options.html",
+            });
+        });
+    } else if (microphoneAccess === true) {
+        startAIAgent();
+    } else if (microphoneAccess === "denied") {
+        textToSpeech(
+            "Uh oh! You've denied Blind Time permission, was this a mistake?"
+        );
     }
 }
 
@@ -43,23 +72,26 @@ function createRecognition() {
 }
 // Played after user holds f2 for 1 second
 async function startAIAgent() {
+    agentOn = true;
     playStartEffect();
     await Sleep(500);
     textToSpeech(agentStartMessage);
 
     // Waits for screenreader to finish before taking in input
     screenReaderEnd(() => {
-        agentStartMessage = "Listening";
-        console.log(recogniton);
-        console.log(recogniton.start());
+        if (agentOn) {
+            agentStartMessage = "Listening";
+            recogniton.start();
 
-        // If the user says nothing, it will stop the listening
-        timeHandler.setTime("noResponse", stopAIAgent, 10);
+            // If the user says nothing, it will stop the listening
+            timeHandler.setTime("noResponse", stopAIAgent, 10);
+        }
     });
 }
 
 // Played when AI Agent is cancelled and the user doesn't produce any noise
 function stopAIAgent() {
+    agentOn = false;
     timeHandler.clearAllTime();
     playStopEffect();
     textToSpeech("Exiting AI Agent");
@@ -95,12 +127,18 @@ function formattedSentences() {
     let formattedSentences = `${sentences.join(".")}.`;
     return formattedSentences;
 }
+
+/* ========================= End of Main Functions ================================== */
+
 /**
  * These are the event listeners that listen for
  * events from the user: when the user starts speaking,
  * when the user speaks a single sentence, and when the user is
  * done speaking
  */
+
+/* ========================= Event Listeners ================================== */
+
 recogniton.addEventListener("result", (event) => {
     speechToTextResult = event.results[event.results.length - 1];
 
@@ -130,3 +168,5 @@ recogniton.addEventListener("speechend", () => {
 // Adds event listener
 chrome.runtime.onMessage.addListener(handleMessage);
 console.log(recogniton);
+
+/* ========================= End of Event Listeners ================================== */

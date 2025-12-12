@@ -104,6 +104,10 @@ async function getCurrentTab() {
     return tabs[0];
 }
 
+function createNewTab(url) {
+    chrome.tabs.create({ url: url });
+}
+
 // Logs a message within the console of the active tab
 async function logMsg(msg) {
     let tab = await getCurrentTab();
@@ -155,6 +159,10 @@ function handleMessage(message, sender, sendResponse) {
         if ("purpose" in data) {
             if (data.purpose === "openSidePanel") {
                 openPanel();
+            } else if (data.purpose === "createNewTab") {
+                createNewTab(data.url);
+            } else if (data.purpose === "createSessionData") {
+                createSessionData();
             }
         }
     }

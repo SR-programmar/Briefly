@@ -7,10 +7,11 @@ It relies on several functions/classes from other files
 
 */
 
+/* ========================= Variables ================================== */
+
 console.log("Content.js Script injected into tab");
 
 const summaryModes = ["Medium", "Short", "Two-Sentence", "Long"];
-
 // Summarized Content
 let summarizedContent = "";
 let loadContent;
@@ -23,13 +24,16 @@ let timesControlPressed = 0;
 
 // Boolean tells if screen reader is active or not
 let screenReaderActive = false;
+let gesture = false;
+let agentOn = false;
 
 // To Handle AI Agent audio input functionality
 let startTime;
 let keyWasHeld = false;
 
-/* Summarizes the webpage in the background so the user doesn't have to
-wait too long for the summary */
+/* ========================= End of Variables ================================== */
+
+/* ========================= Functions ================================== */
 
 /* Waits for summarizeContent to be finished,
  * and then sets summarizedContent
@@ -56,20 +60,6 @@ async function playSummary() {
     });
 }
 
-document.addEventListener("keyup", () => {
-    let timeHeld = new Date().getSeconds() - startTime;
-    keyWasHeld = false;
-    startTime = undefined;
-
-    if (timeHeld >= 1) {
-        console.log("F2 was held for", timeHeld, "seconds");
-        agentOn = true;
-        sendMessage("sidePanel", {
-            purpose: "startAgent",
-        });
-    }
-});
-
 // Retrieves session data with key 'extensionActive'
 async function getExtensionActive() {
     let active = await chrome.storage.session.get("extensionActive");
@@ -84,19 +74,50 @@ async function setActive(state, ttsMsg) {
     chrome.storage.session.set({ extensionActive: state });
 }
 
-// Sets the state of 'extensionActive' when user opens new URL
-getExtensionActive().then((result) => {
-    extensionActive = result.extensionActive;
+function asyncVarValues() {
+    // Sets the state of 'extensionActive' when user opens new URL
+    getExtensionActive().then((result) => {
+        extensionActive = result.extensionActive;
+    });
+}
+
+/* ========================= End of Functions ================================== */
+
+asyncVarValues();
+
+/* ========================= Event Listeners ================================== */
+
+document.addEventListener("keyup", () => {
+    let timeHeld = new Date().getSeconds() - startTime;
+    keyWasHeld = false;
+    startTime = undefined;
+
+    if (timeHeld >= 1) {
+        agentOn = true;
+        sendMessage("sidePanel", {
+            purpose: "startAgent",
+        });
+        console.log("Message sent");
+
+        console.log("F2 was held for", timeHeld, "seconds");
+    }
 });
 
 document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.shiftKey) {
-        if (!extensionActive) {
-            setActive(!extensionActive, "Activated");
-            sendMessage("service-worker", { purpose: "openSidePanel" });
-        } else if (extensionActive) {
-            setActive(!extensionActive, "Deactivated");
-            sendMessage("sidePanel", { purpose: "closeSidePanel" });
+        if (navigator.userActivation.isActive) {
+            if (extensionActive === undefined) {
+                sendMessage("service-worker", { purpose: "createSessionData" });
+            } else if (!extensionActive) {
+                setActive(!extensionActive, "Activated");
+                sendMessage("service-worker", { purpose: "openSidePanel" });
+            } else if (extensionActive) {
+                setActive(!extensionActive, "Deactivated");
+            }
+        } else {
+            textToSpeech(
+                "We're terribbly sorry, you need to click the screen with your mouse once in order for Blind Time to activate"
+            );
         }
     }
 
@@ -144,7 +165,7 @@ document.addEventListener("keydown", (event) => {
             }
 
             if (agentOn) {
-                continueAgentConversation();
+                textToSpeech("Interrupted, now listening");
             }
         }
 
@@ -167,7 +188,6 @@ document.addEventListener("keydown", (event) => {
 /** User gesture is required for extension to play audio or
  * open side panel
  */
-let gesture = false;
 
 document.addEventListener("click", () => {
     if (!gesture) {
@@ -185,3 +205,5 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         }
     }
 });
+
+/* ========================= Event Listeners ================================== */

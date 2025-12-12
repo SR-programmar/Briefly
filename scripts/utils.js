@@ -1,3 +1,6 @@
+// Global timeHandler
+// const globTimeHandler = new TimeOutHandler();
+
 // Waits for a sepcified amount of time
 async function Sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
