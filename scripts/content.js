@@ -53,9 +53,27 @@ async function playSummary() {
     textToSpeech("Starting Summary");
     await Sleep(1500);
 
+    /** Waiting for summary */
+    while (summarizedContent === "") {
+        await Sleep(3000);
+        if (summarizedContent != "") {
+            break;
+        } else {
+            playAlertEffect();
+        }
+
+        await Sleep(3000);
+    }
+
     loadContent.then(() => {
         if (screenReaderActive) {
+            console.log("*** Summary ***");
+            console.log(`*** Mode: ${summaryModes[0]}\n\n ***`);
             textToSpeech(summarizedContent);
+            summarizedContent = "";
+            screenReaderEnd(() => {
+                screenReaderActive = false;
+            });
         }
     });
 }

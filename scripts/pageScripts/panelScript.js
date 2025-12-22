@@ -8,6 +8,7 @@ getMicrophoneAcess().then((result) => {
 let speechToTextResult;
 let sentences;
 let agentOn = false;
+let agentResponse = "";
 
 let timeHandler = new TimeOutHandler("noResponse, finalResult, fallBack");
 
@@ -98,27 +99,39 @@ function stopAIAgent() {
     recogniton.stop();
 }
 
+async function getAgentResponse() {
+    //let response = await callAgent(formattedSentences());
+    //agentResponse = response;
+    agentResponse = "";
+}
+
 // Called once user has given input
 async function afterSpeech() {
+    getAgentResponse();
     timeHandler.clearAllTime();
     recogniton.stop();
 
     textToSpeech("Thank you, please wait");
 
-    let response = await callAgent(formattedSentences());
+    // While an async function is pending, play this loop
+    // When finishsed, break
 
-    textToSpeech(response);
+    while (agentResponse === "") {
+        await Sleep(3000);
+        if (agentResponse != "") {
+            break;
+        } else {
+            playAlertEffect();
+        }
+
+        await Sleep(3000);
+    }
+    textToSpeech(agentResponse);
 
     screenReaderEnd(() => {
         recogniton.start();
         timeHandler.setTime("noResponse", stopAIAgent, 10);
     });
-}
-
-// This is to allow the user to stop the agent while it's speaking 'Ctrl'
-// so they may give it another question
-function continueAgentConversation() {
-    textToSpeech("Interrupted, now listening...");
 }
 
 /* Returns a formatted string of the sentences array to be sent to be
