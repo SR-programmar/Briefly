@@ -1,13 +1,20 @@
 {
-    "name": "Summary Master Extension",
-    "description": "This is an extension used to summarize webpages for visually impaired",
+    "name": "Blind Time",
+    "description": "An extension that assists the visually impaired by saving them time",
     "version": "1.0",
     "manifest_version": 3,
     "background": {
-        "service_worker": "scripts/service-worker.js",
+        "service_worker": "scripts/service-worker/service-worker.js",
         "type": "module"
     },
-    "permissions": ["activeTab", "scripting", "audioCapture", "tabs"],
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "audioCapture",
+        "tabs",
+        "sidePanel",
+        "storage"
+    ],
     "host_permissions": ["https://*/"],
     "commands": {
         "summarize-page": {
@@ -27,18 +34,22 @@
     "content_scripts": [
         {
             "js": [
+                "scripts/contentScripts/utils.js",
+                "scripts/contentScripts/session.js",
                 "scripts/classes/timeOutHandler.js",
-                "scripts/screenReader.js",
-                "scripts/audio.js",
-                "scripts/agent.js",
-                "scripts/requestServer.js",
-                "scripts/content.js",
-                "scripts/agentFunctions.js"
+                "scripts/contentScripts/screenReader.js",
+                "scripts/contentScripts/audio.js",
+                "scripts/contentScripts/requestServer.js",
+                "scripts/contentScripts/content.js",
+                "scripts/contentScripts/agentFunctions.js"
             ],
             "matches": ["<all_urls>"]
         }
     ],
     "action": {
         "default_popup": "index.html"
+    },
+    "side_panel": {
+        "default_path": "pages/sidePanel.html"
     }
 }

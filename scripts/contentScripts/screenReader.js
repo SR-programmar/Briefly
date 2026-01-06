@@ -9,6 +9,7 @@ but this is built in and won't get rate-limited.
 // The speechsynthesis utterance
 const screenReader = new SpeechSynthesisUtterance();
 const synth = window.speechSynthesis;
+let screenReaderPaused = false;
 
 // Converts given text to speech
 function textToSpeech(givenText) {
@@ -17,17 +18,36 @@ function textToSpeech(givenText) {
     synth.speak(screenReader);
 }
 
+// Pauses or Unpauses the screen reader
+function pauseScreenReader() {
+    playPauseEffect();
+
+    if (!screenReaderPaused) {
+        synth.pause();
+    } else {
+        synth.resume();
+    }
+
+    screenReaderPaused = !screenReaderPaused;
+}
+
 // Stops screen reader
 function stopScreenreader() {
     synth.cancel();
     setText("Cancelling screen reader");
     synth.speak(screenReader);
     screenReaderActive = false;
+    screenReaderPaused = false;
 }
 
 // Sets screenreader's text
 function setText(text) {
     screenReader.text = text;
+}
+
+// Returns screenreader's text
+function getText() {
+    return screenReader.text;
 }
 
 // Calls 'callBack' after screenreader is done speaking
