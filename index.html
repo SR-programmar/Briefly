@@ -1,17 +1,59 @@
 <html>
     <head>
-        <link rel="stylesheet" href="style.css" />
+        <link rel="stylesheet" href="style.css">
+        <!-- Google Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     </head>
+    
     <body>
-        <h1 class="title">Summarizer Extension</h1>
+        <div class="title">
+            <!-- Placeholder for logo -->
+            <div class="img"></div>
 
-        <div class="buttons-container">
-            <button class="btn">Summarize Page - Ctrl x 3</button>
-            <button class="btn">Magnifier Tool - Ctrl + M</button>
-            <button class="btn">Dark Mode - Ctrl + D</button>
-            <button class="btn">Focus Mode - Ctrl + F</button>
-            <button id="options-button">HI</button>
+            <div style="display: flex; flex-direction: column">
+                <h1>WebSum Guide</h1>
+                <span>For instructors</span>
+            </div>
+
+        </div>
+
+        <p class="note">*This guide will help you in using this extension*</p>
+
+        <div class="container">
+            <div class="card">
+                <h1>Activation</h1>
+                
+            </div>
+
+            <div class="card">
+                <h1>Summarization</h1>
+                <p style="margin-bottom: 5px;">Summarizes webpage's contents.</p>
+
+                <h2>Commands</h2>
+                <hr style="width: 35%">
+                <ol><b>Ctrl x3</b> - Start Summarization</ol>
+                <ol><b>Shift</b> - Change Summary Length</ol>
+                <ol><b>Caps Lock</b> - Pause/Play Summary</ol>
+                
+                <br>
+                <h2>Summary Types</h2>
+                <hr style="width: 45%">
+                <ol><b>General</b> - General content + structure of webpage</ol>
+                <ol><b>Research</b> - Only content of webpage for research</ol>
+                <ol><b>Paragraph by Paragraph</b> - Summarize each paragraph</ol>
+
+                <br>
+                <h2>Summary Lengths</h2>
+                <hr style="width: 55%">
+                <ol><b>Long</b> - 300 words</ol>
+                <ol><b>Medium</b> - 100 words</ol>
+                <ol><b>Short</b> - 50 words</ol>
+                <ol><b>2 sentences</b> - only 2 sentences</ol>
+            </div>
+
+            <div class="card"></div>
         </div>
     </body>
-    <script src="scripts/popScript.js"></script>
 </html>
