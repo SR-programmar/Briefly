@@ -28,3 +28,25 @@ async function listTabs() {
 
     textToSpeech("Here are all the tabs: " + tabsText);
 }
+
+function searchElements(text) {
+    console.log("Searching interactive elements...");
+
+    const elements = document.querySelectorAll("a, button")
+    
+    for (let i = 0; i < elements.length; i++) {
+        if (elements[i].innerText.toLowerCase().includes(text.toLowerCase())) {
+            return elements[i];
+        }
+    }
+}
+
+function clickElement(element) {
+    element.click();
+}
+
+document.addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.key === "l") {
+        clickElement(searchElements("machine learning"));
+    }
+});
