@@ -8,16 +8,28 @@ by going to another server and getting the summarization
 
 // Provides a template to fetch data from the server
 async function serverFetch(endpoint, json_obj) {
-    const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(json_obj),
+    return new Promise((resolve, reject) => {
+        const response = fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(json_obj),
+        })
+            .then(async (response) => {
+                const data = await response.json();
+                resolve(data);
+            })
+            .catch((error) => {
+                reject({
+                    error: error,
+                    summary: "An error occurred, please try again",
+                    agentResponse:
+                        "An error occurred, please try talking again or press Escape to cancel",
+                    index: -1,
+                });
+            });
     });
-
-    const data = await response.json();
-    return data;
 }
 
 /* Makes a call to the Python server which sends back a summary
@@ -36,6 +48,11 @@ async function summarizeContent(summaryMode) {
     const response = await serverFetch(endpoint2, {
         input: document.body.innerText,
         mode: summaryMode,
+    }).catch((error) => {
+        console.log(
+            `********\n\nError when fetching from server:\n${error.error}\n\n********`
+        );
+        return error;
     });
 
     // data.summary is the summary
@@ -54,15 +71,24 @@ as a response to the user's wish
 async function callAgent(sentences) {
     // API Endpoint
 
-    /// Endpoint - Used for testing
+    /// Endpoint 1 - Used for testing
     const endpoint1 =
         "https://summary-chrome-extension-backend.vercel.app/simple-agent-call";
 
-    // Endpoint - The actual AI Agent, used in production
+    // Endpoint 2 - The actual AI Agent, used in production
     const endpoint2 =
         "https://summary-chrome-extension-backend.vercel.app/agent-call";
 
-    const response = await serverFetch(endpoint1, { input: sentences });
+    // Fetch from server
+    const response = await serverFetch(endpoint2, { input: sentences }).catch(
+        (error) => {
+            console.log(
+                `********\n\nError when fetching from server:\n${error.error}\n\n********`
+            );
+            return error;
+        }
+    );
+
     console.log(response);
     // It returns an array so we must specify [0] to get the first object
     const json_response = JSON.parse(response.response)[0];
