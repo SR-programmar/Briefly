@@ -129,18 +129,16 @@ document.addEventListener("keydown", (event) => {
         allowShift = false;
 
         if (navigator.userActivation.isActive) {
-            if (extensionActive === undefined) {
-                sendMessage("service-worker", { purpose: "createSessionData" });
-            } else if (!extensionActive) {
-                setActive(!extensionActive, "Activated");
+            if (!extensionActive) {
+                setActive(true, "Activated");
                 sendMessage("service-worker", { purpose: "openSidePanel" });
             } else if (extensionActive) {
-                setActive(!extensionActive, "Deactivated");
+                setActive(false, "Deactivated");
             }
         } else {
             let activation = extensionActive ? "deactivate" : "activate";
             textToSpeech(
-                `We are terribbly sorry, you need to click the screen with your mouse once in order for Blind Time to ${activation}`
+                `We are terribbly sorry, you need to click the screen with your mouse once in order for Briefly to ${activation}`
             );
             console.log(`***** Not activated *****`);
         }
