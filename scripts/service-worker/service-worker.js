@@ -131,4 +131,3 @@ function handleMessage(message, sender, sendResponse) {
 
 // Adds event listener
 chrome.runtime.onMessage.addListener(handleMessage);
-createSessionData();
