@@ -12,7 +12,7 @@ button.addEventListener("click", () => {
 // Played when user grants permission
 function granted(mic) {
     textToSpeech(
-        "Thank you, blind time now has access to your microphone. I will return you to your original tab."
+        "Thank you, Briefly now has access to your microphone. I will return you to your original tab."
     );
     screenReaderEnd(() => {
         stopTrack(mic);
@@ -22,7 +22,7 @@ function granted(mic) {
 
 // Played when user denies permission
 function denied() {
-    textToSpeech("You have denied blind time access to your microphone");
+    textToSpeech("You have denied Briefly access to your microphone");
     screenReaderEnd(() => {
         exitOptions();
     });

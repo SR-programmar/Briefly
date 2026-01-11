@@ -18,7 +18,6 @@ function setAgentOn(state) {
 // Changes session data of 'extensionActive'
 async function setActive(state, ttsMsg) {
     textToSpeech(ttsMsg);
-    extensionActive = undefined;
-
+    extensionActive = state;
     setSessionData("extensionActive", state);
 }

@@ -26,14 +26,14 @@ of the webpage's content that a user is currently on.
 async function summarizeContent(summaryMode) {
     // Endpoint 1 - Weak extractive summarization to avoid rate limits
     const endpoint1 =
-        "https://summary-chrome-extension-backend.onrender.com/simple-sum";
+        "https://summary-chrome-extension-backend.vercel.app/simple-sum";
 
     // Endpoint 2 - Strong AI summarization with OpenAI
     const endpoint2 =
-        "https://summary-chrome-extension-backend.onrender.com/ai-sum";
+        "https://summary-chrome-extension-backend.vercel.app/ai-sum";
 
     // Fetch from server
-    const response = await serverFetch(endpoint1, {
+    const response = await serverFetch(endpoint2, {
         input: document.body.innerText,
         mode: summaryMode,
     });
@@ -56,13 +56,13 @@ async function callAgent(sentences) {
 
     /// Endpoint - Used for testing
     const endpoint1 =
-        "https://summary-chrome-extension-backend.onrender.com/simple-agent-call";
+        "https://summary-chrome-extension-backend.vercel.app/simple-agent-call";
 
     // Endpoint - The actual AI Agent, used in production
     const endpoint2 =
-        "https://summary-chrome-extension-backend.onrender.com/agent-call";
+        "https://summary-chrome-extension-backend.vercel.app/agent-call";
 
-    const response = await serverFetch(endpoint2, { input: sentences });
+    const response = await serverFetch(endpoint1, { input: sentences });
     console.log(response);
     // It returns an array so we must specify [0] to get the first object
     const json_response = JSON.parse(response.response)[0];
