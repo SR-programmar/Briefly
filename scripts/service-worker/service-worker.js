@@ -1,3 +1,8 @@
+// Allows other parts of the extension to access session data
+chrome.storage.session.setAccessLevel({
+    accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS",
+});
+
 // Listens to keyboard commands (used for testing the service-worker)
 chrome.commands.onCommand.addListener(async (command) => {
     // When user presses Ctrl+B
@@ -42,11 +47,6 @@ function createSessionData() {
 
     chrome.storage.session.set({ agentActive: false }).then(() => {
         console.log("Value was set for agentActive"); // Debugging
-    });
-
-    // Allows other parts of the extension to access session data
-    chrome.storage.session.setAccessLevel({
-        accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS",
     });
 }
 
@@ -120,8 +120,6 @@ function handleMessage(message, sender, sendResponse) {
                 createNewTab(data.url);
             } else if (data.purpose === "closeCurrentTab") {
                 closeCurrentTab();
-            } else if (data.purpose === "createSessionData") {
-                createSessionData();
             }
         }
     }

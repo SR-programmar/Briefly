@@ -123,12 +123,13 @@ document.addEventListener("keyup", () => {
 /* ========> Key Down <======== */
 document.addEventListener("keydown", (event) => {
     /* Ctrl + Shift */
+    console.log("===================================================");
     if (event.ctrlKey && event.shiftKey) {
         /* The browser requires a user gesture meaning they must 'click'
         on the page some where */
         allowShift = false;
 
-        if (navigator.userActivation.isActive) {
+        if (navigator.userActivation.hasBeenActive) {
             if (!extensionActive) {
                 setActive(true, "Activated");
                 sendMessage("service-worker", { purpose: "openSidePanel" });
@@ -136,6 +137,7 @@ document.addEventListener("keydown", (event) => {
                 setActive(false, "Deactivated");
             }
         } else {
+            // With hasBeenActive, we may remove this portion of code later
             let activation = extensionActive ? "deactivate" : "activate";
             textToSpeech(
                 `We are terribbly sorry, you need to click the screen with your mouse once in order for Briefly to ${activation}`
@@ -208,7 +210,7 @@ document.addEventListener("keydown", (event) => {
             }
 
             if (agentOn) {
-                textToSpeech("Interrupted, now listening");
+                sendMessage("sidePanel", { purpose: "interruptAgent" });
             }
         }
 

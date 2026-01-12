@@ -54,6 +54,13 @@ function handleMessage(message, sender, sendResponse) {
         if (data.purpose === "updateMicrophonePermission") {
             setMicrophoneAccess();
         }
+
+        if (data.purpose === "interruptAgent") {
+            textToSpeech("Interrupted, now listening");
+            screenReaderEnd(() => {
+                recogniton.start();
+            });
+        }
     }
 }
 /* ========================= Main Functions ================================== */
