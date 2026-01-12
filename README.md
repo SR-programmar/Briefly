@@ -11,8 +11,6 @@ It relies on several easy-to-use key commands
 
 YouTube Video: [Link](https://www.youtube.com/watch?v=MkQ5LlmyN3Y)
 
-https://github.com/surya-rajendran065/Briefly/resources/Briefly-installation-video.mkv
-
 ## Installation Steps Written
 
 ### **Note** These instructions may not be finished
