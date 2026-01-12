@@ -129,7 +129,7 @@ document.addEventListener("keydown", (event) => {
         on the page some where */
         allowShift = false;
 
-        if (navigator.userActivation.hasBeenActive) {
+        if (navigator.userActivation.isActive) {
             if (!extensionActive) {
                 setActive(true, "Activated");
                 sendMessage("service-worker", { purpose: "openSidePanel" });
