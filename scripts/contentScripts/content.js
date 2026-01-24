@@ -221,9 +221,9 @@ document.addEventListener("keydown", (event) => {
         }
 
         /* CapsLock */
-        // Pauses screenreader
+        // Pauses screen reader
         if (event.key === "CapsLock") {
-            if (!screenReaderActive) {
+            if (!screenReaderActive && !agentOn) {
                 shiftArr(summaryTypes, "selected summary type: ");
             }
 
