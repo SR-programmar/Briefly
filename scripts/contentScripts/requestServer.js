@@ -89,7 +89,9 @@ async function callAgent(sentences) {
         },
     );
 
-    console.log(response);
+    if ("error" in response) {
+        return response.agentResponse;
+    }
     // It returns an array so we must specify [0] to get the first object
     const json_response = JSON.parse(response.response)[0];
 
@@ -109,11 +111,4 @@ async function callAgent(sentences) {
     }
     // Return response from agent
     return json_response.agentResponse;
-}
-
-function agentResponse(json_response) {
-    const idx = json_response.index; // Function index
-    const args = json_response.arguments; // Arguments if function needs it
-    console.log("Index: ", idx);
-    console.log("Args: ", args);
 }
