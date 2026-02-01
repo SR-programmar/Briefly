@@ -1,7 +1,6 @@
-
 // Opens a url in the current tab
 function openUrl(url) {
-    window.open(url, "_self");
+    sendMessage("service-worker", { purpose: "openUrl", url: url });
 }
 
 // Opens a url in a new tab
@@ -31,8 +30,8 @@ async function listTabs() {
 function searchElements(text) {
     console.log("Searching interactive elements...");
 
-    const elements = document.querySelectorAll("a, button")
-    
+    const elements = document.querySelectorAll("a, button");
+
     for (let i = 0; i < elements.length; i++) {
         if (elements[i].innerText.toLowerCase().includes(text.toLowerCase())) {
             return elements[i];

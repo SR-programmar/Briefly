@@ -70,6 +70,18 @@ async function logMsg(msg) {
     });
 }
 
+async function openUrl(url) {
+    let tab = await getCurrentTab();
+
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: (url) => {
+            window.open(url, "_self");
+        },
+        args: [url],
+    });
+}
+
 // Opens side panel globally across windows
 function openPanel() {
     chrome.windows.getCurrent((window) => {
@@ -81,6 +93,7 @@ function openPanel() {
 function handleMessage(message, sender, sendResponse) {
     if (message.target === "service-worker") {
         const data = message.data;
+        const url = data.url;
 
         if ("func_message" in data) {
             if (data.func_message === "listTabs") {
@@ -97,6 +110,8 @@ function handleMessage(message, sender, sendResponse) {
                 createNewTab(data.url);
             } else if (data.purpose === "closeCurrentTab") {
                 closeCurrentTab();
+            } else if (data.purpose === "openUrl") {
+                openUrl(data.url);
             }
         }
     }

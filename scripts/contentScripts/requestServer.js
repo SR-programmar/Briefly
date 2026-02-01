@@ -88,7 +88,7 @@ async function callAgent(sentences) {
             return error;
         },
     );
-
+    console.log(response);
     if ("error" in response) {
         return response.agentResponse;
     }

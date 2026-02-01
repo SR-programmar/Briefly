@@ -70,7 +70,9 @@ function handleMessage(message, sender, sendResponse) {
 // If starting the recognition results in an error, exit agent
 function startRecognition() {
     try {
-        recognition.start();
+        if (agentOn) {
+            recognition.start();
+        }
     } catch {
         stopAIAgent();
         textToSpeech("An error occurred, AI Agent had to cancel");
@@ -136,11 +138,13 @@ async function startAIAgent() {
 
 // Played when AI Agent is cancelled and the user doesn't produce any noise
 function stopAIAgent() {
-    setAgentActive(false);
-    timeHandler.clearAllTime();
-    playStopEffect();
-    textToSpeech("Exiting AI Agent");
-    recognition.stop();
+    if (agentOn) {
+        setAgentActive(false);
+        timeHandler.clearAllTime();
+        playStopEffect();
+        textToSpeech("Exiting AI Agent");
+        recognition.stop();
+    }
 }
 
 // Sets 'agentresponse' to a variable once the server returns a response
@@ -164,7 +168,7 @@ async function afterSpeech() {
         textToSpeech("Thank you, please wait");
 
         // While an async function is pending, play this loop
-        // When finishsed, break
+        // When finished, break
 
         while (agentResponse === "" && agentOn) {
             await Sleep(3000);
@@ -188,14 +192,12 @@ async function afterSpeech() {
 /* Returns a formatted string of the sentences array to be sent to be
 processed by the AI Agent */
 function formattedSentences() {
-    return new Promise((resolve, reject) => {
-        if (sentences === undefined) {
-            reject("An error occurred, please try to speak less");
-        } else {
-            let formattedSentences = `${sentences.join(".")}.`;
-            resolve(formattedSentences);
-        }
-    });
+    if (sentences === undefined) {
+        stopAIAgent();
+    } else {
+        let formattedSentences = `${sentences.join(".")}.`;
+        return formattedSentences;
+    }
 }
 
 /* ========================= End of Main Functions ================================== */
@@ -222,6 +224,7 @@ recognition.addEventListener("result", (event) => {
     timeHandler.setTime("finalResult", afterSpeech, 3);
     sentences = text.split("\n");
     console.log(`(${text})`);
+    console.log("Sentences", formattedSentences(sentences));
 });
 
 // This listener is qued when audio is heard
