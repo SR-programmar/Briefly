@@ -194,6 +194,7 @@ processed by the AI Agent */
 function formattedSentences() {
     if (sentences === undefined) {
         stopAIAgent();
+        textToSpeech("An error occurred, your speech wasn't picked up");
     } else {
         let formattedSentences = `${sentences.join(".")}.`;
         return formattedSentences;
