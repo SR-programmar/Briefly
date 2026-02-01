@@ -34,8 +34,12 @@ function exitOptions() {
     sendMessage("service-worker", { purpose: "closeCurrentTab" });
 }
 
-// This stops the recording immediately after user grants permission
-// because it isn't needed here
+/*
+
+ This stops the recording immediately after user grants permission
+ because it isn't needed here
+ 
+*/
 function stopTrack(device) {
     console.log(device.getTracks()[0]);
     device.getTracks()[0].stop();

@@ -1,0 +1,33 @@
+
+Audio File: Stop.mp3
+Author: Cao, Zijing (2023).
+Website: Figshare
+Accessed November 16th, 2025
+URL: https://doi.org/10.6084/m9.figshare.23152871.v1
+
+Audio File: Start.mp3
+Author: FoxBoyTails <user_id:49447089>
+Website: Pixabay
+Accessed November 16th, 2025.
+URL: https://pixabay.com/users/foxboytails-49447089/
+
+Audio File: AlertEffect.mp3
+Author: DRAGON-STUDIO
+Website: Pixabay.
+Assessed December 18th, 2025.
+URL: https://pixabay.com/users/dragon-studio-38165424/
+
+Audio File: pauseSound.mp3
+Author: DRAGON-STUDIO
+Website: Pixabay.
+Assessed December 23rd, 2025.
+URL: https://pixabay.com/users/dragon-studio-38165424/
+
+
+### Citation template ###
+
+Audio File:
+Author:
+Website
+Accessed
+URL:

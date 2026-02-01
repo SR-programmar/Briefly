@@ -34,9 +34,9 @@
     "content_scripts": [
         {
             "js": [
+                "scripts/classes/timeOutHandler.js",
                 "scripts/contentScripts/utils.js",
                 "scripts/contentScripts/session.js",
-                "scripts/classes/timeOutHandler.js",
                 "scripts/contentScripts/screenReader.js",
                 "scripts/contentScripts/audio.js",
                 "scripts/contentScripts/requestServer.js",

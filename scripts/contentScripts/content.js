@@ -7,11 +7,12 @@ It relies on several functions/classes from other files
 
 */
 
-/* ========================= Variables ================================== */
-
 console.log("Content.js Script injected into tab");
 
-const summaryModes = ["Medium", "Short", "Two-Sentence", "Long"];
+/* ========================= Variables ================================== */
+
+const summaryLengths = ["Medium", "Short", "Two-Sentence", "Long"];
+const summaryTypes = ["general", "research", "paragraph", "learn"];
 // Summarized Content
 let summarizedContent = "";
 let loadContent;
@@ -28,12 +29,18 @@ let agentOn = false;
 let allowShift = false;
 
 // To Handle AI Agent audio input functionality
-let startTime;
 let keyWasHeld = false;
 
 /* ========================= End of Variables ================================== */
 
 /* ======================== *** Functions *** =============================== */
+
+// Shifts an array
+function shiftArr(arr, msg) {
+    arr.unshift(arr[arr.length - 1]);
+    arr.pop();
+    textToSpeech(`${msg} ${arr[0]}`);
+}
 
 /* ========> Summary functions <======== */
 
@@ -41,9 +48,11 @@ let keyWasHeld = false;
  * and then sets summarizedContent
  *   to the response */
 async function createSummary() {
-    await summarizeContent(summaryModes[0]).then((result) => {
-        summarizedContent = result;
-    });
+    await summarizeContent(summaryLengths[0], summaryTypes[0]).then(
+        (result) => {
+            summarizedContent = result;
+        },
+    );
 
     return "Success";
 }
@@ -70,7 +79,7 @@ async function playSummary() {
     loadContent.then(() => {
         if (screenReaderActive) {
             console.log("*** Summary ***");
-            console.log(`*** Mode: ${summaryModes[0]}\n\n ***`);
+            console.log(`*** Mode: ${summaryLengths[0]}\n\n ***`);
             textToSpeech(summarizedContent);
             summarizedContent = "";
             screenReaderEnd(() => {
@@ -82,7 +91,7 @@ async function playSummary() {
 
 /* ========> End of Summary functions <======== */
 
-/* ========> Session Data Functions <======== */
+/* ========> Functions <======== */
 
 function asyncVarValues() {
     // Sets the state of 'extensionActive' when user opens new URL
@@ -95,8 +104,7 @@ function asyncVarValues() {
     });
 }
 
-/* ========> End of Session Data Functions <======== */
-
+/* ========> Functions <======== */
 /* ========================= End of Functions ================================== */
 
 asyncVarValues();
@@ -105,17 +113,8 @@ asyncVarValues();
 
 /* ========> Key Up <======== */
 document.addEventListener("keyup", () => {
-    let timeHeld = new Date().getSeconds() - startTime;
+    globalHandler.clearTime("F2Held");
     keyWasHeld = false;
-    startTime = undefined;
-
-    if (timeHeld >= 1) {
-        sendMessage("sidePanel", {
-            purpose: "startAgent",
-        });
-
-        console.log("F2 was held for", timeHeld, "seconds");
-    }
 });
 
 /* ========> End of Key Up <======== */
@@ -129,7 +128,7 @@ document.addEventListener("keydown", (event) => {
         on the page some where */
         allowShift = false;
 
-        if (navigator.userActivation.isActive) {
+        if (navigator.userActivation.hasBeenActive) {
             if (!extensionActive) {
                 setActive(true, "Activated");
                 sendMessage("service-worker", { purpose: "openSidePanel" });
@@ -140,7 +139,7 @@ document.addEventListener("keydown", (event) => {
             // With hasBeenActive, we may remove this portion of code later
             let activation = extensionActive ? "deactivate" : "activate";
             textToSpeech(
-                `We are terribbly sorry, you need to click the screen with your mouse once in order for Briefly to ${activation}`
+                `We are terribly sorry, you need to interact with the page with your mouse or keyboard once in order for Briefly to ${activation}`,
             );
             console.log(`***** Not activated *****`);
         }
@@ -154,12 +153,20 @@ document.addEventListener("keydown", (event) => {
     /* Extension Keyboard Commands */
     if (extensionActive) {
         /* F2 */
-        // Checks if user holds down F2 for atleast 1 second to trigger Agent
+        // Checks if user holds down F2 for at least 1 second to trigger Agent
         if (event.key === "F2") {
             if (!keyWasHeld) {
-                startTime = new Date().getSeconds();
-                keyWasHeld = true;
+                globalHandler.setTime(
+                    "F2Held",
+                    () => {
+                        sendMessage("sidePanel", {
+                            purpose: "startAgent",
+                        });
+                    },
+                    1,
+                );
             }
+            keyWasHeld = true;
         }
 
         /* Escape */
@@ -170,11 +177,8 @@ document.addEventListener("keydown", (event) => {
         }
 
         if (event.key === "Shift" && allowShift) {
-            // Shifts the summaryModes array
-            summaryModes.unshift(summaryModes[summaryModes.length - 1]);
-            summaryModes.pop();
-
-            textToSpeech(`Selected mode: ${summaryModes[0]}`);
+            // Shifts the summaryLengths array
+            shiftArr(summaryLengths, "selected length:");
         }
 
         allowShift = true;
@@ -185,7 +189,6 @@ document.addEventListener("keydown", (event) => {
             if (screenReaderActive) {
                 stopScreenreader();
                 timesControlPressed = 0;
-                playStopEffect();
             } else {
                 timesControlPressed++;
 
@@ -215,8 +218,12 @@ document.addEventListener("keydown", (event) => {
         }
 
         /* CapsLock */
-        // Pauses screenreader
+        // Pauses screen reader
         if (event.key === "CapsLock") {
+            if (!screenReaderActive && !agentOn) {
+                shiftArr(summaryTypes, "selected summary type: ");
+            }
+
             if (screenReaderActive) {
                 pauseScreenReader();
             } else if (agentOn) {
@@ -230,9 +237,7 @@ document.addEventListener("keydown", (event) => {
 
 /* ========> End of Key Down <======== */
 
-/** User gesture is required for extension to play audio or
- * open side panel
- */
+/* ========================= Event Listeners ================================== */
 
 /* This code ensures that all content scripts update the state of
 'extensionActive' to avoid bugs */
@@ -252,4 +257,4 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
 });
 
-/* ========================= Event Listeners ================================== */
+/* ========================= End of Event Listeners ================================== */

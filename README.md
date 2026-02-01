@@ -1,19 +1,19 @@
 # Briefly
 
-This is an extension used to summarize webpages for the visually impaired.
+-   This is a Chrome Extension used to summarize webpages and primarily designed for the visually impaired.
 
-It uses **Artificial intelligence** to summarize a webpage and then reads aloud
-the summary for the blind user to listen to.
+-   It uses **Artificial intelligence** to summarize a webpage and then reads aloud
+    the summary for the visually impaired user to listen to.
 
-It relies on several easy-to-use key commands
+-   It relies on several easy-to-use key commands
 
 ## Installation Steps Video
 
-YouTube Video: [Link](https://www.youtube.com/watch?v=MkQ5LlmyN3Y)
+-   Removed for now
 
 ## Installation Steps Written
 
-### **Note** These instructions may not be finished
+### **Note:** These instructions may not be finished
 
 1. Download the extension as a **.zip** file at [Github](https://github.com/surya-rajendran065/Briefly)
 
@@ -27,10 +27,15 @@ YouTube Video: [Link](https://www.youtube.com/watch?v=MkQ5LlmyN3Y)
    ![Alt text](resources/step%205.png "First step")
 
 6. On the top left corner, click **"Load unpacked"**, then search for the **Briefly** folder you unzipped eariler.
-7. **PLEASE NOTE THAT THERE'S A FOLDER WITHIN the "Briefly" Folder THAT YOU MUST SELECT. If you miss this, you'll get an error!** Make sure to click on the folder "Briefly" Twice!
 
     ![Alt text](resources/step%206.png "First step")
 
-8. Now, you should see something like this appear in the extensions manager tab.
+7. Now, you should see something like this appear in the extensions manager tab.
+8. Click on details, scroll down and enable "pin to toolbar"
+9. You should see a Square "B" icon appear next to the "Extensions icon"
+10. Click on it and it will give you instructions for how to use the Briefly Chrome Extension
 
-9. Congraluations! You now have access to the websum extension! Refer here to how to use the extension
+# Important Notes
+
+-   Briefly only works on webpages. Attempting to use its commands on a "New tab" window or any other **Chrome internal page** wont work
+-   You must interact with the webpage by pressing keys on your keyboard or clicking on the screen with your mouse. Otherwise, Briefly wont work.

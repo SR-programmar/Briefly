@@ -1,0 +1,28 @@
+File: Javascript function getCurrentTab(), in 'scripts/service-worker.js'
+Author: Unknown
+Website: Chrome for developers
+Accessed November 5th, 2025
+URL: https://developer.chrome.com/docs/extensions/reference/api/tabs
+
+File: Javascript 'code' that recognizes speech and stores it in a variable
+located in 'scripts/pageScripts/panelScript.js'
+Author: Wes Bos
+Website:YouTube
+Accessed November 22nd, 2025
+URL: https://www.youtube.com/watch?v=0mJC0A72Fnw
+
+File: Javascript 'Sleep()' located in 'scripts/contentScripts/utils.js'
+Author: Unknown
+Website: geeksforgeeks
+Accessed November 25th, 2025.
+URL: https://www.geeksforgeeks.org/javascript/how-to-wait-n-seconds-in-javascript/
+
+
+
+### Citation Template ###
+
+File:
+Author:
+Website:
+Accessed
+URL:

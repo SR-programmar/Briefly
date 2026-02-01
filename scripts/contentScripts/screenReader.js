@@ -6,7 +6,7 @@ but this is built in and won't get rate-limited.
 
 */
 
-// The speechsynthesis utterance
+// Variables
 const screenReader = new SpeechSynthesisUtterance();
 const synth = window.speechSynthesis;
 let screenReaderPaused = false;
@@ -34,6 +34,7 @@ function pauseScreenReader() {
 // Stops screen reader
 function stopScreenreader() {
     synth.cancel();
+    playStopEffect();
     setText("Cancelling screen reader");
     synth.speak(screenReader);
     screenReaderActive = false;

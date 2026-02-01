@@ -1,14 +1,14 @@
 /* 
-Logging strings to check their value can be difficult
-if they contain trailing whitespace or are empty strings.
-This log prints them wrapped around parantheses to tackle
-this issue.
+This file includes functions / variables that several files may rely on
 */
+
+const globalHandler = new TimeOutHandler("F2Held");
+
 function wrp(msg, val) {
     console.log(`${msg} (${val})`);
 }
 
-// Waits for a sepcified amount of time
+// Waits for a specified amount of time
 async function Sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }

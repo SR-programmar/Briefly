@@ -39,17 +39,6 @@ async function listTabs() {
  * End of Agent Function
  */
 
-// Creates session data
-function createSessionData() {
-    chrome.storage.session.set({ extensionActive: false }).then(() => {
-        console.log("Value was set for extensionActive"); // Debugging
-    });
-
-    chrome.storage.session.set({ agentActive: false }).then(() => {
-        console.log("Value was set for agentActive"); // Debugging
-    });
-}
-
 // Gets the current tab
 async function getCurrentTab() {
     const queryOptions = { active: true, currentWindow: true };
@@ -81,15 +70,15 @@ async function logMsg(msg) {
     });
 }
 
-/* Executes a function in the current tab and returns 'true'
-if no errors were present
-*/
-async function executeOnTab(callBack) {
+async function openUrl(url) {
     let tab = await getCurrentTab();
 
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
-        func: callBack,
+        func: (url) => {
+            window.open(url, "_self");
+        },
+        args: [url],
     });
 }
 
@@ -104,6 +93,7 @@ function openPanel() {
 function handleMessage(message, sender, sendResponse) {
     if (message.target === "service-worker") {
         const data = message.data;
+        const url = data.url;
 
         if ("func_message" in data) {
             if (data.func_message === "listTabs") {
@@ -120,6 +110,8 @@ function handleMessage(message, sender, sendResponse) {
                 createNewTab(data.url);
             } else if (data.purpose === "closeCurrentTab") {
                 closeCurrentTab();
+            } else if (data.purpose === "openUrl") {
+                openUrl(data.url);
             }
         }
     }

@@ -16,7 +16,7 @@ class TimeOutHandler {
     }
 
     // Sets a specified timeout
-    setTime(name, callback, seconds = 2) {
+    setTime(name, callback, seconds) {
         this.timeOuts[name] = setTimeout(callback, seconds * 1000);
     }
 

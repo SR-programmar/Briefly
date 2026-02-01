@@ -1,7 +1,6 @@
 // Variables
 let microphoneAccess;
 
-// Variables
 let speechToTextResult;
 let sentences;
 let agentOn = false;
@@ -9,14 +8,14 @@ let agentResponse = "";
 
 let timeHandler = new TimeOutHandler("noResponse, finalResult, fallBack");
 
-const recogniton = createRecognition();
+const recognition = createRecognition();
 let agentStartMessage = `Hello, I'm Rosie, your AI Agent. I will answer
 your questions and requests! press escape to stop talking`;
 
 // Returns the status of microphone access
 // Prompt, Granted, or denied
 function setMicrophoneAccess() {
-    getMicrophoneAcess().then((result) => {
+    getMicrophoneAccess().then((result) => {
         microphoneAccess = result;
         console.log(`Microphone Access is: ${microphoneAccess}`);
     });
@@ -35,8 +34,10 @@ function handleMessage(message, sender, sendResponse) {
 
         // Starts AI Agent conversation
         if (data.purpose === "startAgent") {
-            console.log("Starting...");
-            setUpAgent();
+            if (!agentOn) {
+                console.log("Starting...");
+                setUpAgent();
+            }
         }
 
         // Stops AI Agent conversation
@@ -56,14 +57,27 @@ function handleMessage(message, sender, sendResponse) {
         }
 
         if (data.purpose === "interruptAgent") {
+            recognition.stop();
             textToSpeech("Interrupted, now listening");
             screenReaderEnd(() => {
-                recogniton.start();
+                startRecognition();
             });
         }
     }
 }
 /* ========================= Main Functions ================================== */
+
+// If starting the recognition results in an error, exit agent
+function startRecognition() {
+    try {
+        if (agentOn) {
+            recognition.start();
+        }
+    } catch {
+        stopAIAgent();
+        textToSpeech("An error occurred, AI Agent had to cancel");
+    }
+}
 
 function setAgentActive(state) {
     setAgentOn(state);
@@ -76,7 +90,7 @@ function setUpAgent() {
     if (!microphoneAccess) {
         textToSpeech(
             `You need to give Briefly access to use your microphone,
-                I will open a new tab for you with a button that you can click to give permission. Press your tab key once to get to the button. Once you press it, a prompt will ask you for permission. Use your down arrow key to navigate. Choose 'Allow when using site'`
+                I will open a new tab for you with a button that you can click to give permission. Press your tab key once to get to the button. Once you press it, a prompt will ask you for permission. Use your down arrow key to navigate. Choose 'Allow when using site'`,
         );
 
         screenReaderEnd(() => {
@@ -89,12 +103,12 @@ function setUpAgent() {
         startAIAgent();
     } else if (microphoneAccess === "denied") {
         textToSpeech(
-            "Uh oh! You've denied Briefly permission, was this a mistake?"
+            "Uh oh! You've denied Briefly permission, was this a mistake?",
         );
     }
 }
 
-// Creates a SpeechRecogniton Object
+// Creates a Speechrecognition Object
 function createRecognition() {
     const rec = new window.SpeechRecognition();
     rec.language = "en-US";
@@ -114,7 +128,7 @@ async function startAIAgent() {
     screenReaderEnd(() => {
         if (agentOn) {
             agentStartMessage = "Listening";
-            recogniton.start();
+            startRecognition();
 
             // If the user says nothing, it will stop the listening
             timeHandler.setTime("noResponse", stopAIAgent, 10);
@@ -124,52 +138,67 @@ async function startAIAgent() {
 
 // Played when AI Agent is cancelled and the user doesn't produce any noise
 function stopAIAgent() {
-    setAgentActive(false);
-    timeHandler.clearAllTime();
-    playStopEffect();
-    textToSpeech("Exiting AI Agent");
-    recogniton.stop();
+    if (agentOn) {
+        setAgentActive(false);
+        timeHandler.clearAllTime();
+        playStopEffect();
+        textToSpeech("Exiting AI Agent");
+        recognition.stop();
+    }
 }
 
+// Sets 'agentresponse' to a variable once the server returns a response
 async function getAgentResponse() {
-    let response = await callAgent(formattedSentences());
+    let response = await callAgent(formattedSentences()).catch((error) => {
+        console.log(
+            "********\n\nError when fetching from server:\n${error}\n\n********",
+        );
+        return error;
+    });
     agentResponse = response;
 }
 
 // Called once user has given input
 async function afterSpeech() {
-    getAgentResponse();
-    timeHandler.clearAllTime();
-    recogniton.stop();
+    if (agentOn) {
+        getAgentResponse();
+        timeHandler.clearAllTime();
+        recognition.stop();
 
-    textToSpeech("Thank you, please wait");
+        textToSpeech("Thank you, please wait");
 
-    // While an async function is pending, play this loop
-    // When finishsed, break
+        // While an async function is pending, play this loop
+        // When finished, break
 
-    while (agentResponse === "" && agentOn) {
-        await Sleep(3000);
-        if (agentResponse != "") {
-            break;
-        } else {
-            playAlertEffect();
+        while (agentResponse === "" && agentOn) {
+            await Sleep(3000);
+            if (agentResponse != "") {
+                break;
+            } else {
+                playAlertEffect();
+            }
+
+            await Sleep(3000);
         }
-
-        await Sleep(3000);
+        textToSpeech(agentResponse);
+        agentResponse = "";
+        screenReaderEnd(() => {
+            startRecognition();
+            timeHandler.setTime("noResponse", stopAIAgent, 10);
+        });
     }
-    textToSpeech(agentResponse);
-
-    screenReaderEnd(() => {
-        recogniton.start();
-        timeHandler.setTime("noResponse", stopAIAgent, 10);
-    });
 }
 
 /* Returns a formatted string of the sentences array to be sent to be
 processed by the AI Agent */
 function formattedSentences() {
-    let formattedSentences = `${sentences.join(".")}.`;
-    return formattedSentences;
+    if (sentences === undefined) {
+        stopAIAgent();
+        textToSpeech("An error occurred, your speech wasn't picked up");
+    } else {
+        let formattedSentences = `${sentences.join(".")}.`;
+        return formattedSentences;
+    }
 }
 
 /* ========================= End of Main Functions ================================== */
@@ -183,7 +212,7 @@ function formattedSentences() {
 
 /* ========================= Event Listeners ================================== */
 
-recogniton.addEventListener("result", (event) => {
+recognition.addEventListener("result", (event) => {
     speechToTextResult = event.results[event.results.length - 1];
 
     timeHandler.clearTime("noResponse");
@@ -196,16 +225,17 @@ recogniton.addEventListener("result", (event) => {
     timeHandler.setTime("finalResult", afterSpeech, 3);
     sentences = text.split("\n");
     console.log(`(${text})`);
+    console.log("Sentences", formattedSentences(sentences));
 });
 
 // This listener is qued when audio is heard
-recogniton.addEventListener("speechstart", () => {
+recognition.addEventListener("speechstart", () => {
     console.log("Started speaking :)");
     timeHandler.setTime("fallback", afterSpeech, 10);
 });
 
 // This is played when the url stops the microphone
-recogniton.addEventListener("speechend", () => {
+recognition.addEventListener("speechend", () => {
     console.log("Finished speaking :)");
 });
 
