@@ -102,7 +102,7 @@ async function callAgent(sentences) {
         const functions = [navigateTo, openUrl, listTabs];
 
         if (idx === 0 || idx === 1) {
-            functions[idx](args.arg1);
+            functions[idx](args.url);
         } else {
             functions[idx]();
         }
