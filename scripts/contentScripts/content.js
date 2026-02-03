@@ -96,11 +96,11 @@ async function playSummary() {
 function asyncVarValues() {
     // Sets the state of 'extensionActive' when user opens new URL
     getSessionData("extensionActive").then((result) => {
-        extensionActive = result.extensionActive;
+        extensionActive = result;
     });
 
     getSessionData("agentActive").then((result) => {
-        agentOn = result.agentActive;
+        agentOn = result;
     });
 }
 

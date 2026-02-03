@@ -151,7 +151,7 @@ function stopAIAgent() {
 async function getAgentResponse() {
     let response = await callAgent(formattedSentences()).catch((error) => {
         console.log(
-            "********\n\nError when fetching from server:\n${error}\n\n********",
+            `********\n\nError when fetching from server:\n${error}\n\n********`,
         );
         return error;
     });

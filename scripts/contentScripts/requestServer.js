@@ -64,6 +64,24 @@ async function summarizeContent(summaryLength, summaryType) {
     return response.summary;
 }
 
+/* Calls a function based on AI Agent's JSON object */
+function callAgentFunction(idx, args) {
+    if (idx > -1) {
+        const functions = [navigateTo, openUrl, listTabs, clickInteractive];
+        const indicesURL = [0, 1];
+        console.log(args.clickElementText, idx);
+        if (idx === 3) {
+            functions[idx](args.clickElementText, args);
+        } else if (indicesURL.includes(idx)) {
+            functions[idx](args.url);
+        } else {
+            functions[idx]();
+        }
+    } else {
+        console.log("\n*** Function not needed ***\n");
+    }
+}
+
 /* Makes a call to the Python server which sends back a JSON formatted object
 as a response to the user's wish
 */
@@ -98,16 +116,12 @@ async function callAgent(sentences) {
     const idx = json_response.index; // Function index
     const args = json_response.arguments; // Arguments if function needs it
 
-    if (idx > -1) {
-        const functions = [navigateTo, openUrl, listTabs];
-
-        if (idx === 0 || idx === 1) {
-            functions[idx](args.arg1);
-        } else {
-            functions[idx]();
+    if (Array.isArray(idx)) {
+        for (let i = 0; i < idx.length; i++) {
+            callAgentFunction(idx[i], args);
         }
     } else {
-        console.log("\n*** Function not needed ***\n");
+        callAgentFunction(idx, args);
     }
     // Return response from agent
     return json_response.agentResponse;

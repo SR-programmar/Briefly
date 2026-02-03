@@ -82,6 +82,12 @@ async function openUrl(url) {
     });
 }
 
+// Sends a message and payload to the current tab
+async function sendContent(payload) {
+    let tab = await getCurrentTab();
+    chrome.tabs.sendMessage(tab.id, { target: "agentFunction", data: payload });
+}
+
 // Opens side panel globally across windows
 function openPanel() {
     chrome.windows.getCurrent((window) => {
@@ -112,6 +118,8 @@ function handleMessage(message, sender, sendResponse) {
                 closeCurrentTab();
             } else if (data.purpose === "openUrl") {
                 openUrl(data.url);
+            } else if (data.purpose === "sendContent") {
+                sendContent(data.payload);
             }
         }
     }
