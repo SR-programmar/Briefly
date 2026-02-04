@@ -19,6 +19,7 @@ let loadContent;
 
 // State of extension
 let extensionActive;
+let panelOpen;
 
 // Checks how many times user pressed Control
 let timesControlPressed = 0;
@@ -96,11 +97,11 @@ async function playSummary() {
 function asyncVarValues() {
     // Sets the state of 'extensionActive' when user opens new URL
     getSessionData("extensionActive").then((result) => {
-        extensionActive = result.extensionActive;
+        extensionActive = result;
     });
 
     getSessionData("agentActive").then((result) => {
-        agentOn = result.agentActive;
+        agentOn = result;
     });
 }
 
@@ -128,7 +129,7 @@ document.addEventListener("keydown", (event) => {
         on the page some where */
         allowShift = false;
 
-        if (navigator.userActivation.hasBeenActive) {
+        if (navigator.userActivation.isActive || panelOpen) {
             if (!extensionActive) {
                 setActive(true, "Activated");
                 sendMessage("service-worker", { purpose: "openSidePanel" });
@@ -253,6 +254,11 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         if (key === "agentActive") {
             agentOn = newValue;
             console.log("Agent active set to ", agentOn);
+        }
+
+        if (key === "panelOpen") {
+            panelOpen = newValue;
+            console.log("Panel open set to ", panelOpen);
         }
     }
 });

@@ -22,28 +22,9 @@ async function sendMessage(target, data) {
     return response;
 }
 
-/**
- * Agent Functions
- * These are functions that are needed when the content scripts cannot perform
- * a certain browser operation. They will send a message to the service
- * worker telling it to execute the specified function
- */
-
-// List Current Tabs
-async function listTabs() {
-    let tabs = await chrome.tabs.query({});
-    return tabs;
-}
-
-/**
- * End of Agent Function
- */
-
-// Gets the current tab
-async function getCurrentTab() {
-    const queryOptions = { active: true, currentWindow: true };
-    const tabs = await chrome.tabs.query(queryOptions);
-    return tabs[0];
+// Sets session data by key
+function setSessionData(key, val) {
+    chrome.storage.session.set({ [key]: val });
 }
 
 // Creates a new tab with the specified url
@@ -57,17 +38,24 @@ async function closeCurrentTab() {
     chrome.tabs.remove(currentTab.id);
 }
 
-// Logs a message within the console of the active tab
-async function logMsg(msg) {
-    let tab = await getCurrentTab();
+// Gets the current tab
+async function getCurrentTab() {
+    const queryOptions = { active: true, currentWindow: true };
+    const tabs = await chrome.tabs.query(queryOptions);
+    return tabs[0];
+}
 
-    chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: (msg) => {
-            console.log(msg);
-        },
-        args: [msg],
-    });
+/**
+ * Agent Functions
+ * These are functions that are needed when the content scripts cannot perform
+ * a certain browser operation. They will send a message to the service
+ * worker telling it to execute the specified function
+ */
+
+// List Current Tabs
+async function listTabs() {
+    let tabs = await chrome.tabs.query({});
+    return tabs;
 }
 
 async function openUrl(url) {
@@ -82,11 +70,20 @@ async function openUrl(url) {
     });
 }
 
+/**
+ * End of Agent Function
+ */
+
 // Opens side panel globally across windows
 function openPanel() {
-    chrome.windows.getCurrent((window) => {
-        chrome.sidePanel.open({ windowId: window.id });
-    });
+    try {
+        chrome.windows.getCurrent((window) => {
+            chrome.sidePanel.open({ windowId: window.id });
+        });
+        setSessionData("panelOpen", true);
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // Handles messages from content scripts

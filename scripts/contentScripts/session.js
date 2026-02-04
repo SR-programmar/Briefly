@@ -1,7 +1,7 @@
 // Retrieves session data with key
 async function getSessionData(key) {
     let value = await chrome.storage.session.get([key]);
-    return value;
+    return value[key];
 }
 
 // Sets session data by key
