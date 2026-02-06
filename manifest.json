@@ -15,20 +15,11 @@
         "sidePanel",
         "storage"
     ],
-    "host_permissions": ["https://*/"],
-    "commands": {
-        "summarize-page": {
-            "suggested_key": {
-                "default": "Ctrl+B",
-                "mac": "Command+B"
-            },
-            "description": "Summarize the current webpage"
-        }
-    },
+    "host_permissions": ["https://*/*"],
     "web_accessible_resources": [
         {
             "resources": ["audio/*"],
-            "matches": ["<all_urls>"]
+            "matches": ["https://*/*"]
         }
     ],
     "content_scripts": [
@@ -43,7 +34,7 @@
                 "scripts/contentScripts/content.js",
                 "scripts/contentScripts/agentFunctions.js"
             ],
-            "matches": ["<all_urls>"]
+            "matches": ["https://*/*"]
         }
     ],
     "action": {

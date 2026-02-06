@@ -105,6 +105,7 @@ async function callAgent(sentences) {
             functions[idx](args.url);
         } else {
             functions[idx]();
+            json_response.agentResponse = "no response needed";
         }
     } else {
         console.log("\n*** Function not needed ***\n");

@@ -1,11 +1,16 @@
-// Variables
+/* Variables */
 let microphoneAccess;
 
+// Used to store synthesized speech and formatted sentences
 let speechToTextResult;
 let sentences;
+// The state of the AI Agent
 let agentOn = false;
+let requestSent = false;
+// The response from the AI Agent given back from the server
 let agentResponse = "";
 
+// Handles timers with the AI Agent and Audio Input system
 let timeHandler = new TimeOutHandler("noResponse, finalResult, fallBack");
 
 const recognition = createRecognition();
@@ -23,7 +28,7 @@ function setMicrophoneAccess() {
 
 setMicrophoneAccess();
 
-// Handles messages from content scripts
+// Handles messages from content scripts and service-worker
 function handleMessage(message, sender, sendResponse) {
     const data = message.data;
     if (message.target === "sidePanel") {
@@ -56,6 +61,7 @@ function handleMessage(message, sender, sendResponse) {
             setMicrophoneAccess();
         }
 
+        // Interrupts the AI Agent's response but doesn't terminate conversation
         if (data.purpose === "interruptAgent") {
             recognition.stop();
             textToSpeech("Interrupted, now listening");
@@ -67,18 +73,19 @@ function handleMessage(message, sender, sendResponse) {
 }
 /* ========================= Main Functions ================================== */
 
-// If starting the recognition results in an error, exit agent
+/* If starting the recognition results in an error,
+ the agent forcefully closes */
 function startRecognition() {
     try {
         if (agentOn) {
             recognition.start();
         }
     } catch {
-        stopAIAgent();
-        textToSpeech("An error occurred, AI Agent had to cancel");
+        stopAIAgent("An error occurred, AI Agent had to cancel");
     }
 }
 
+// Sets the local variable and session data to 'state'
 function setAgentActive(state) {
     setAgentOn(state);
     agentOn = state;
@@ -137,30 +144,33 @@ async function startAIAgent() {
 }
 
 // Played when AI Agent is cancelled and the user doesn't produce any noise
-function stopAIAgent() {
+function stopAIAgent(msg = "Exiting AI Agent") {
     if (agentOn) {
         setAgentActive(false);
         timeHandler.clearAllTime();
         playStopEffect();
-        textToSpeech("Exiting AI Agent");
+        textToSpeech(msg);
         recognition.stop();
     }
 }
 
 // Sets 'agentresponse' to a variable once the server returns a response
 async function getAgentResponse() {
-    let response = await callAgent(formattedSentences()).catch((error) => {
+    requestSent = true;
+
+    let response = await callAgent(sentences).catch((error) => {
         console.log(
             "********\n\nError when fetching from server:\n${error}\n\n********",
         );
         return error;
     });
+
     agentResponse = response;
 }
 
 // Called once user has given input
 async function afterSpeech() {
-    if (agentOn) {
+    if (agentOn && !requestSent) {
         getAgentResponse();
         timeHandler.clearAllTime();
         recognition.stop();
@@ -169,20 +179,29 @@ async function afterSpeech() {
 
         // While an async function is pending, play this loop
         // When finished, break
-
+        let timesWaited = 0;
         while (agentResponse === "" && agentOn) {
             await Sleep(3000);
             if (agentResponse != "") {
                 break;
+            } else if (timesWaited > 3) {
+                stopAIAgent(
+                    "The server didn't respond in time. Please try again.",
+                );
+
+                break;
             } else {
                 playAlertEffect();
             }
-
+            timesWaited++;
             await Sleep(3000);
         }
-        textToSpeech(agentResponse);
-        agentResponse = "";
+        if (agentResponse != "no response needed" && agentOn) {
+            textToSpeech(agentResponse);
+            agentResponse = "";
+        }
         screenReaderEnd(() => {
+            requestSent = false;
             startRecognition();
             timeHandler.setTime("noResponse", stopAIAgent, 10);
         });
@@ -191,14 +210,14 @@ async function afterSpeech() {
 
 /* Returns a formatted string of the sentences array to be sent to be
 processed by the AI Agent */
-function formattedSentences() {
-    if (sentences === undefined) {
-        stopAIAgent();
-        textToSpeech("An error occurred, your speech wasn't picked up");
-    } else {
-        let formattedSentences = `${sentences.join(".")}.`;
-        return formattedSentences;
+function toSpeechArray(list) {
+    let sentences = [];
+    for (let i = 0; i < list.length; i++) {
+        sentences.push(
+            Array.from(list[i]).map((result) => result.transcript)[0],
+        );
     }
+    return sentences.join(".") + ".";
 }
 
 /* ========================= End of Main Functions ================================== */
@@ -214,18 +233,16 @@ function formattedSentences() {
 
 recognition.addEventListener("result", (event) => {
     speechToTextResult = event.results[event.results.length - 1];
-
     timeHandler.clearTime("noResponse");
     timeHandler.clearTime("finalResult");
-
     const text = Array.from(speechToTextResult)
         .map((result) => result.transcript)
         .join("\n");
 
     timeHandler.setTime("finalResult", afterSpeech, 3);
-    sentences = text.split("\n");
-    console.log(`(${text})`);
-    console.log("Sentences", formattedSentences(sentences));
+    sentences = toSpeechArray(event.results);
+    console.log(`Just spoken: (${text})`);
+    console.log("Sentences:", sentences);
 });
 
 // This listener is qued when audio is heard

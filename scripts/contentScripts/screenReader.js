@@ -32,10 +32,10 @@ function pauseScreenReader() {
 }
 
 // Stops screen reader
-function stopScreenreader() {
+function stopScreenreader(msg = "Cancelling screen reader") {
     synth.cancel();
     playStopEffect();
-    setText("Cancelling screen reader");
+    setText(msg);
     synth.speak(screenReader);
     screenReaderActive = false;
     screenReaderPaused = false;

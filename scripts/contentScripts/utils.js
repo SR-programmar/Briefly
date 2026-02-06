@@ -4,8 +4,11 @@ This file includes functions / variables that several files may rely on
 
 const globalHandler = new TimeOutHandler("F2Held");
 
-function wrp(msg, val) {
-    console.log(`${msg} (${val})`);
+// Shifts an array
+function shiftArr(arr, msg) {
+    arr.unshift(arr[arr.length - 1]);
+    arr.pop();
+    textToSpeech(`${msg} ${arr[0]}`);
 }
 
 // Waits for a specified amount of time

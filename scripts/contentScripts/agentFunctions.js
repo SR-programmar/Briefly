@@ -23,10 +23,11 @@ async function listTabs() {
     for (let i = 0; i < tabTitles.length; i++) {
         tabsText += `${i + 1}. ${tabTitles[i]}\n`;
     }
-
     textToSpeech("Here are all the tabs: " + tabsText);
 }
 
+/* Searches through all anchor and button tags to find element with
+matching text */
 function searchElements(text) {
     console.log("Searching interactive elements...");
 
@@ -39,10 +40,12 @@ function searchElements(text) {
     }
 }
 
+// Clicks a button or anchor tag on the screen
 function clickElement(element) {
     element.click();
 }
 
+// Testing
 document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.key === "l") {
         clickElement(searchElements("machine learning"));

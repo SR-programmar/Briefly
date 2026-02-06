@@ -3,15 +3,6 @@ chrome.storage.session.setAccessLevel({
     accessLevel: "TRUSTED_AND_UNTRUSTED_CONTEXTS",
 });
 
-// Listens to keyboard commands (used for testing the service-worker)
-chrome.commands.onCommand.addListener(async (command) => {
-    // When user presses Ctrl+B
-    if (command === "summarize-page") {
-        // Prints message alerting that Ctrl+B has been pressed
-        logMsg("Pressed Ctrl + B");
-    }
-});
-
 // This function is used to send messages
 async function sendMessage(target, data) {
     const response = await chrome.runtime.sendMessage({
@@ -45,6 +36,18 @@ async function getCurrentTab() {
     return tabs[0];
 }
 
+// Opens side panel globally across windows
+function openPanel() {
+    try {
+        chrome.windows.getCurrent((window) => {
+            chrome.sidePanel.open({ windowId: window.id });
+        });
+        setSessionData("panelOpen", true);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 /**
  * Agent Functions
  * These are functions that are needed when the content scripts cannot perform
@@ -52,12 +55,13 @@ async function getCurrentTab() {
  * worker telling it to execute the specified function
  */
 
-// List Current Tabs
+// Returns a list of all the tabs open
 async function listTabs() {
     let tabs = await chrome.tabs.query({});
     return tabs;
 }
 
+// Opens the specified URL in the current active tab
 async function openUrl(url) {
     let tab = await getCurrentTab();
 
@@ -73,18 +77,6 @@ async function openUrl(url) {
 /**
  * End of Agent Function
  */
-
-// Opens side panel globally across windows
-function openPanel() {
-    try {
-        chrome.windows.getCurrent((window) => {
-            chrome.sidePanel.open({ windowId: window.id });
-        });
-        setSessionData("panelOpen", true);
-    } catch (error) {
-        console.log(error);
-    }
-}
 
 // Handles messages from content scripts
 function handleMessage(message, sender, sendResponse) {

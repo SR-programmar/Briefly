@@ -11,7 +11,9 @@ console.log("Content.js Script injected into tab");
 
 /* ========================= Variables ================================== */
 
+// Different lengths that summary could be
 const summaryLengths = ["Medium", "Short", "Two-Sentence", "Long"];
+// Different types of summaries, used to suit user preference
 const summaryTypes = ["general", "research", "paragraph", "learn"];
 // Summarized Content
 let summarizedContent = "";
@@ -19,6 +21,7 @@ let loadContent;
 
 // State of extension
 let extensionActive;
+// State of side panel
 let panelOpen;
 
 // Checks how many times user pressed Control
@@ -26,6 +29,7 @@ let timesControlPressed = 0;
 
 // Boolean tells if screen reader is active or not
 let screenReaderActive = false;
+// State of Agent
 let agentOn = false;
 let allowShift = false;
 
@@ -35,13 +39,6 @@ let keyWasHeld = false;
 /* ========================= End of Variables ================================== */
 
 /* ======================== *** Functions *** =============================== */
-
-// Shifts an array
-function shiftArr(arr, msg) {
-    arr.unshift(arr[arr.length - 1]);
-    arr.pop();
-    textToSpeech(`${msg} ${arr[0]}`);
-}
 
 /* ========> Summary functions <======== */
 
@@ -64,15 +61,23 @@ async function playSummary() {
     await Sleep(500);
     textToSpeech("Starting Summary");
     await Sleep(1500);
+    let timesWaited = 0;
 
     /** Waiting for summary */
     while (summarizedContent === "" && screenReaderActive) {
         await Sleep(3000);
         if (summarizedContent != "") {
             break;
+        } else if (timesWaited > 3) {
+            stopScreenreader(
+                "The server didn't respond in time. Please try again.",
+            );
+            break;
         } else {
             playAlertEffect();
         }
+
+        timesWaited++;
 
         await Sleep(3000);
     }
@@ -143,6 +148,7 @@ document.addEventListener("keydown", (event) => {
                 `We are terribly sorry, you need to interact with the page with your mouse or keyboard once in order for Briefly to ${activation}`,
             );
             console.log(`***** Not activated *****`);
+            console.log("Panel open", panelOpen);
         }
         console.log("*** Pressed Shift + Ctrl ***");
     }
