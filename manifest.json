@@ -1,7 +1,7 @@
 {
     "name": "Briefly",
     "description": "An extension that assists the visually impaired by saving them time",
-    "version": "1.0",
+    "version": "3.0",
     "manifest_version": 3,
     "background": {
         "service_worker": "scripts/service-worker/service-worker.js",
@@ -15,6 +15,7 @@
         "sidePanel",
         "storage"
     ],
+    "icons": { "64": "resources/logos/briefly_b.png" },
     "host_permissions": ["https://*/*"],
     "web_accessible_resources": [
         {
