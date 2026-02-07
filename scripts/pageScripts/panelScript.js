@@ -120,7 +120,7 @@ function createRecognition() {
     const rec = new window.SpeechRecognition();
     rec.language = "en-US";
     rec.continuous = true;
-    rec.interimResults = false;
+    rec.interimResults = true;
 
     return rec;
 }
@@ -174,7 +174,7 @@ async function afterSpeech() {
         getAgentResponse();
         timeHandler.clearAllTime();
         recognition.stop();
-
+        console.log("Sentences to AI Agent: ", sentences);
         textToSpeech("Thank you, please wait");
 
         // While an async function is pending, play this loop
@@ -248,7 +248,7 @@ recognition.addEventListener("result", (event) => {
 // This listener is qued when audio is heard
 recognition.addEventListener("speechstart", () => {
     console.log("Started speaking :)");
-    timeHandler.setTime("fallback", afterSpeech, 10);
+    timeHandler.setTime("fallback", afterSpeech, 15);
 });
 
 // This is played when the url stops the microphone

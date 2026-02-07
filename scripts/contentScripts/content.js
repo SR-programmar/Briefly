@@ -128,6 +128,7 @@ document.addEventListener("keyup", () => {
 document.addEventListener("keydown", (event) => {
     /* Ctrl + Shift */
     console.log("===================================================");
+
     if (event.ctrlKey && event.shiftKey) {
         /* The browser requires a user gesture meaning they must 'click'
         on the page some where */
@@ -238,7 +239,7 @@ document.addEventListener("keydown", (event) => {
         }
     }
 
-    console.log(timesControlPressed, screenReaderActive, event.key); // Debugging
+    console.log(timesControlPressed.toString(), screenReaderActive, event.key); // Debugging
 });
 
 /* ========> End of Key Down <======== */
