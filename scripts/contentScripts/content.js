@@ -1,7 +1,7 @@
 /*
 
 This script is where all of the app's main functionality is held
-It listens for keyboard commands and clicks to determine what the user
+It listens for keyboard commands to determine what the user
 wants to do.
 It relies on several functions/classes from other files
 
@@ -25,8 +25,8 @@ let extensionActive;
 let panelOpen;
 
 // Checks how many times user pressed Control
-let timesControlPressed = 0;
-
+let timesControlPressed = new TimesPressed(3);
+let timesShiftPressed = new TimesPressed(3);
 // Boolean tells if screen reader is active or not
 let screenReaderActive = false;
 // State of Agent
@@ -97,8 +97,7 @@ async function playSummary() {
 
 /* ========> End of Summary functions <======== */
 
-/* ========> Functions <======== */
-
+// Asynchronously gets value of session data
 function asyncVarValues() {
     // Sets the state of 'extensionActive' when user opens new URL
     getSessionData("extensionActive").then((result) => {
@@ -142,7 +141,7 @@ document.addEventListener("keydown", (event) => {
                 setActive(false, "Deactivated");
             }
         } else {
-            // With hasBeenActive, we may remove this portion of code later
+            // This code will run if the sidePanel isn't open
             let activation = extensionActive ? "deactivate" : "activate";
             textToSpeech(
                 `We are terribly sorry, you need to interact with the page with your mouse or keyboard once in order for Briefly to ${activation}`,
@@ -186,6 +185,14 @@ document.addEventListener("keydown", (event) => {
         if (event.key === "Shift" && allowShift) {
             // Shifts the summaryLengths array
             shiftArr(summaryLengths, "selected length:");
+            timesShiftPressed.add();
+            if (timesShiftPressed.conditionMet()) {
+                textToSpeech("Opening Tutorial Tab");
+                sendMessage("service-worker", {
+                    purpose: "createNewTab",
+                    url: "pages/instructions.html",
+                });
+            }
         }
 
         allowShift = true;
@@ -195,19 +202,11 @@ document.addEventListener("keydown", (event) => {
         if (event.key === "Control") {
             if (screenReaderActive) {
                 stopScreenreader();
-                timesControlPressed = 0;
             } else {
-                timesControlPressed++;
-
-                // Resets times pressed if they don't press again in 1.5 seconds
-                if (timesControlPressed == 1) {
-                    setTimeout(() => {
-                        timesControlPressed = 0;
-                    }, 1500);
-                }
+                timesControlPressed.add();
             }
 
-            if (timesControlPressed === 3) {
+            if (timesControlPressed.conditionMet()) {
                 if (!screenReaderActive) {
                     screenReaderActive = true;
 
@@ -265,6 +264,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         if (key === "panelOpen") {
             panelOpen = newValue;
             console.log("Panel open set to ", panelOpen);
+            screenReaderEnd(() => {
+                textToSpeech("Press Shift 3 times to access our tutorial");
+            });
         }
     }
 });

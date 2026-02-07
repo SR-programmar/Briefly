@@ -48,6 +48,9 @@ function clickElement(element) {
 // Testing
 document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.key === "l") {
-        clickElement(searchElements("machine learning"));
+        sendMessage("service-worker", {
+            purpose: "createNewTab",
+            url: "pages/instructions.html",
+        });
     }
 });

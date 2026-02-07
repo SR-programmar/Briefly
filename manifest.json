@@ -27,6 +27,7 @@
         {
             "js": [
                 "scripts/classes/timeOutHandler.js",
+                "scripts/classes/timesPressed.js",
                 "scripts/contentScripts/utils.js",
                 "scripts/contentScripts/session.js",
                 "scripts/contentScripts/screenReader.js",
