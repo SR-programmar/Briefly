@@ -1,7 +1,7 @@
 {
     "name": "Briefly",
     "description": "An extension that assists the visually impaired by saving them time",
-    "version": "1.0",
+    "version": "3.0",
     "manifest_version": 3,
     "background": {
         "service_worker": "scripts/service-worker/service-worker.js",
@@ -15,26 +15,19 @@
         "sidePanel",
         "storage"
     ],
-    "host_permissions": ["https://*/"],
-    "commands": {
-        "summarize-page": {
-            "suggested_key": {
-                "default": "Ctrl+B",
-                "mac": "Command+B"
-            },
-            "description": "Summarize the current webpage"
-        }
-    },
+    "icons": { "64": "resources/logos/briefly_b.png" },
+    "host_permissions": ["https://*/*"],
     "web_accessible_resources": [
         {
             "resources": ["audio/*"],
-            "matches": ["<all_urls>"]
+            "matches": ["https://*/*"]
         }
     ],
     "content_scripts": [
         {
             "js": [
                 "scripts/classes/timeOutHandler.js",
+                "scripts/classes/timesPressed.js",
                 "scripts/contentScripts/utils.js",
                 "scripts/contentScripts/session.js",
                 "scripts/contentScripts/screenReader.js",
@@ -43,7 +36,7 @@
                 "scripts/contentScripts/content.js",
                 "scripts/contentScripts/agentFunctions.js"
             ],
-            "matches": ["<all_urls>"]
+            "matches": ["https://*/*"]
         }
     ],
     "action": {

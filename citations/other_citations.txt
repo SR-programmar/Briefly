@@ -1,0 +1,20 @@
+Resource: ResizePlus
+Service: Resizing image to specific size (e.g 500x500 --> 64x64)
+Use:
+We used ResizePlus to resize our logo into a 64x64 image
+to use it as the logo for our chrome extension,
+The image is located at resources/logos/briefly_b.png
+URL: https://resizeplus.com/
+
+
+# =========================================================================
+
+Resource: RoboBraille
+Service: Converts text into Braille instructions
+Use:
+We converted an html document 'instructions.html' into Braille instructions
+that can be interpreted by a Braille embosser. A Braille embosser is
+a special printer that can print Braille instructions.
+URL: https://www.robobraille.org/
+
+# =========================================================================

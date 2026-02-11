@@ -1,5 +1,11 @@
+/*
+
+This file includes functions that panelScript needs
+function properly
+
+*/
+
 // Returns true if permission is granted and false otherwise
-// If user accidentally denied permission, then it returns 'denied'
 async function getMicrophoneAccess() {
     let permissionStatus = await navigator.permissions.query({
         name: "microphone",

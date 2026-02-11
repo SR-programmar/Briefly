@@ -8,7 +8,7 @@ to summarize webpages, and process user requests for the AI Agent.
 // Provides a template to fetch data from the server
 async function serverFetch(endpoint, json_obj) {
     return new Promise((resolve, reject) => {
-        const response = fetch(endpoint, {
+        fetch(endpoint, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -69,8 +69,6 @@ as a response to the user's wish
 */
 
 async function callAgent(sentences) {
-    // API Endpoint
-
     /// Endpoint 1 - Used for testing
     const endpoint1 =
         "https://summary-chrome-extension-backend.vercel.app/simple-agent-call";
@@ -105,6 +103,7 @@ async function callAgent(sentences) {
             functions[idx](args.url);
         } else {
             functions[idx]();
+            json_response.agentResponse = "no response needed";
         }
     } else {
         console.log("\n*** Function not needed ***\n");

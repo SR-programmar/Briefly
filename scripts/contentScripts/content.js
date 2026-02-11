@@ -1,7 +1,7 @@
 /*
 
 This script is where all of the app's main functionality is held
-It listens for keyboard commands and clicks to determine what the user
+It listens for keyboard commands to determine what the user
 wants to do.
 It relies on several functions/classes from other files
 
@@ -11,7 +11,9 @@ console.log("Content.js Script injected into tab");
 
 /* ========================= Variables ================================== */
 
+// Different lengths that summary could be
 const summaryLengths = ["Medium", "Short", "Two-Sentence", "Long"];
+// Different types of summaries, used to suit user preference
 const summaryTypes = ["general", "research", "paragraph", "learn"];
 // Summarized Content
 let summarizedContent = "";
@@ -19,13 +21,15 @@ let loadContent;
 
 // State of extension
 let extensionActive;
+// State of side panel
 let panelOpen;
 
 // Checks how many times user pressed Control
-let timesControlPressed = 0;
-
+let timesControlPressed = new TimesPressed(3);
+let timesShiftPressed = new TimesPressed(3);
 // Boolean tells if screen reader is active or not
 let screenReaderActive = false;
+// State of Agent
 let agentOn = false;
 let allowShift = false;
 
@@ -35,13 +39,6 @@ let keyWasHeld = false;
 /* ========================= End of Variables ================================== */
 
 /* ======================== *** Functions *** =============================== */
-
-// Shifts an array
-function shiftArr(arr, msg) {
-    arr.unshift(arr[arr.length - 1]);
-    arr.pop();
-    textToSpeech(`${msg} ${arr[0]}`);
-}
 
 /* ========> Summary functions <======== */
 
@@ -64,15 +61,23 @@ async function playSummary() {
     await Sleep(500);
     textToSpeech("Starting Summary");
     await Sleep(1500);
+    let timesWaited = 0;
 
     /** Waiting for summary */
     while (summarizedContent === "" && screenReaderActive) {
         await Sleep(3000);
         if (summarizedContent != "") {
             break;
+        } else if (timesWaited > 3) {
+            stopScreenreader(
+                "The server didn't respond in time. Please try again.",
+            );
+            break;
         } else {
             playAlertEffect();
         }
+
+        timesWaited++;
 
         await Sleep(3000);
     }
@@ -92,8 +97,7 @@ async function playSummary() {
 
 /* ========> End of Summary functions <======== */
 
-/* ========> Functions <======== */
-
+// Asynchronously gets value of session data
 function asyncVarValues() {
     // Sets the state of 'extensionActive' when user opens new URL
     getSessionData("extensionActive").then((result) => {
@@ -124,6 +128,7 @@ document.addEventListener("keyup", () => {
 document.addEventListener("keydown", (event) => {
     /* Ctrl + Shift */
     console.log("===================================================");
+
     if (event.ctrlKey && event.shiftKey) {
         /* The browser requires a user gesture meaning they must 'click'
         on the page some where */
@@ -137,12 +142,13 @@ document.addEventListener("keydown", (event) => {
                 setActive(false, "Deactivated");
             }
         } else {
-            // With hasBeenActive, we may remove this portion of code later
+            // This code will run if the sidePanel isn't open
             let activation = extensionActive ? "deactivate" : "activate";
             textToSpeech(
                 `We are terribly sorry, you need to interact with the page with your mouse or keyboard once in order for Briefly to ${activation}`,
             );
             console.log(`***** Not activated *****`);
+            console.log("Panel open", panelOpen);
         }
         console.log("*** Pressed Shift + Ctrl ***");
     }
@@ -180,6 +186,14 @@ document.addEventListener("keydown", (event) => {
         if (event.key === "Shift" && allowShift) {
             // Shifts the summaryLengths array
             shiftArr(summaryLengths, "selected length:");
+            timesShiftPressed.add();
+            if (timesShiftPressed.conditionMet()) {
+                textToSpeech("Opening Tutorial Tab");
+                sendMessage("service-worker", {
+                    purpose: "createNewTab",
+                    url: "pages/instructions.html",
+                });
+            }
         }
 
         allowShift = true;
@@ -189,19 +203,11 @@ document.addEventListener("keydown", (event) => {
         if (event.key === "Control") {
             if (screenReaderActive) {
                 stopScreenreader();
-                timesControlPressed = 0;
             } else {
-                timesControlPressed++;
-
-                // Resets times pressed if they don't press again in 1.5 seconds
-                if (timesControlPressed == 1) {
-                    setTimeout(() => {
-                        timesControlPressed = 0;
-                    }, 1500);
-                }
+                timesControlPressed.add();
             }
 
-            if (timesControlPressed === 3) {
+            if (timesControlPressed.conditionMet()) {
                 if (!screenReaderActive) {
                     screenReaderActive = true;
 
@@ -233,7 +239,7 @@ document.addEventListener("keydown", (event) => {
         }
     }
 
-    console.log(timesControlPressed, screenReaderActive, event.key); // Debugging
+    console.log(timesControlPressed.toString(), screenReaderActive, event.key); // Debugging
 });
 
 /* ========> End of Key Down <======== */
@@ -259,6 +265,9 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         if (key === "panelOpen") {
             panelOpen = newValue;
             console.log("Panel open set to ", panelOpen);
+            screenReaderEnd(() => {
+                textToSpeech("Press Shift 3 times to access our tutorial");
+            });
         }
     }
 });

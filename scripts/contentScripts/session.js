@@ -9,7 +9,7 @@ function setSessionData(key, val) {
     chrome.storage.session.set({ [key]: val });
 }
 
-// Sets the session data 'agentActive' to 'state' across all tabs
+// Sets the session data 'agentActive' to change state across all tabs
 function setAgentOn(state) {
     agentOn = state;
     setSessionData("agentActive", state);
