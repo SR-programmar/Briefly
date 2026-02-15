@@ -86,6 +86,8 @@ async function playSummary() {
         if (screenReaderActive) {
             console.log("*** Summary ***");
             console.log(`*** Mode: ${summaryLengths[0]}\n\n ***`);
+            console.log(`*** Length: ${summaryLengths[0]}\n\n ***`);
+            console.log(`*** Mode: ${summaryTypes[0]}\n\n ***`);
             textToSpeech(summarizedContent);
             summarizedContent = "";
             screenReaderEnd(() => {

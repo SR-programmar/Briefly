@@ -74,6 +74,12 @@ async function openUrl(url) {
     });
 }
 
+// Sends a message and payload to the current tab
+async function sendContent(payload) {
+    let tab = await getCurrentTab();
+    chrome.tabs.sendMessage(tab.id, { target: "agentFunction", data: payload });
+}
+
 /**
  * End of Agent Function
  */
@@ -82,7 +88,6 @@ async function openUrl(url) {
 function handleMessage(message, sender, sendResponse) {
     if (message.target === "service-worker") {
         const data = message.data;
-        const url = data.url;
 
         if ("func_message" in data) {
             if (data.func_message === "listTabs") {
@@ -101,6 +106,8 @@ function handleMessage(message, sender, sendResponse) {
                 closeCurrentTab();
             } else if (data.purpose === "openUrl") {
                 openUrl(data.url);
+            } else if (data.purpose === "sendContent") {
+                sendContent(data.payload);
             }
         }
     }
