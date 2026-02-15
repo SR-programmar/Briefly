@@ -199,13 +199,15 @@ async function afterSpeech() {
         if (agentResponse != "no response needed" && agentOn) {
             textToSpeech(agentResponse);
             agentResponse = "";
+            requestSent = false;
         }
         screenReaderEnd(() => {
-            requestSent = false;
             startRecognition();
             timeHandler.setTime("noResponse", stopAIAgent, 10);
         });
     }
+    console.log("Request sent: ", requestSent);
+    console.log("Agent On: ", agentOn);
 }
 
 /* Returns a formatted string of the sentences array to be sent to be

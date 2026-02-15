@@ -11,17 +11,12 @@ function navigateTo(url) {
 // Lists all tabs that are currently opened
 async function listTabs() {
     const tabs = await sendMessage("service-worker", {
-        func_message: "listTabs",
+        purpose: "listTabs",
     });
-    let tabTitles = [];
+    let tabsText = "";
 
     for (let i = 0; i < tabs.tabs.length; i++) {
-        tabTitles.push(tabs.tabs[i].title);
-    }
-
-    let tabsText = "";
-    for (let i = 0; i < tabTitles.length; i++) {
-        tabsText += `${i + 1}. ${tabTitles[i]}\n`;
+        tabsText += `${i + 1}. ${tabs.tabs[i].title}\n`;
     }
     textToSpeech("Here are all the tabs: " + tabsText);
 }
@@ -43,7 +38,6 @@ function searchElements(text) {
     return undefined;
 }
 
-// Clicks a button or anchor tag on the screen
 // Clicks an anchor tag or button element on the screen
 function clickElement(element) {
     if (element != undefined) {
@@ -55,10 +49,7 @@ function clickElement(element) {
 // Testing
 document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.key === "l") {
-        sendMessage("service-worker", {
-            purpose: "createNewTab",
-            url: "pages/instructions.html",
-        });
+        listTabs();
     }
 });
 
@@ -83,7 +74,8 @@ function agentFunctionMessageHandler(message, sender, sendResponse) {
         const data = message.data;
 
         if ("purpose" in data) {
-            if (data.purpose === "tabReady") {
+            const purpose = data.purpose;
+            if (purpose === "tabReady") {
                 checkSessionData("clickElementText").then((r) => {
                     if (r != undefined) {
                         console.log(searchElements(r));
@@ -91,7 +83,7 @@ function agentFunctionMessageHandler(message, sender, sendResponse) {
                         setSessionData("clickElementText", "None");
                     }
                 });
-            } else if (data.purpose === "clickElement") {
+            } else if (purpose === "clickElement") {
                 clickElement(searchElements(data.text));
             }
         }

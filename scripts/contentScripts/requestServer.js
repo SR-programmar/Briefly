@@ -69,7 +69,7 @@ function callAgentFunction(idx, args) {
     if (idx > -1) {
         const functions = [navigateTo, openUrl, listTabs, clickInteractive];
         const indicesURL = [0, 1];
-        console.log(args.clickElementText, idx);
+
         if (idx === 3) {
             functions[idx](args.clickElementText, args);
         } else if (indicesURL.includes(idx)) {
