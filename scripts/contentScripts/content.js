@@ -88,6 +88,9 @@ async function playSummary() {
             console.log(`*** Mode: ${summaryLengths[0]}\n\n ***`);
             console.log(`*** Length: ${summaryLengths[0]}\n\n ***`);
             console.log(`*** Mode: ${summaryTypes[0]}\n\n ***`);
+            console.log(
+                `*** Total Characters ${summarizedContent.length}\n\n***`,
+            );
             textToSpeech(summarizedContent);
             summarizedContent = "";
             screenReaderEnd(() => {

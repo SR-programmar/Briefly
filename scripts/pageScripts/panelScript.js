@@ -146,6 +146,7 @@ async function startAIAgent() {
 // Played when AI Agent is cancelled and the user doesn't produce any noise
 function stopAIAgent(msg = "Exiting AI Agent") {
     if (agentOn) {
+        requestSent = false;
         setAgentActive(false);
         timeHandler.clearAllTime();
         playStopEffect();
@@ -198,6 +199,7 @@ async function afterSpeech() {
         }
         if (agentResponse != "no response needed" && agentOn) {
             textToSpeech(agentResponse);
+            console.log("Agent Response:", agentResponse);
             agentResponse = "";
             requestSent = false;
         }

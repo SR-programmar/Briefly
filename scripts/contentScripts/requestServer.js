@@ -121,6 +121,11 @@ async function callAgent(sentences) {
     } else {
         callAgentFunction(idx, args);
     }
+
+    // Special string to tell program not to use TextToSpeech()
+    if (idx === 2) {
+        return "no response needed";
+    }
     // Return response from agent
     return json_response.agentResponse;
 }
