@@ -114,10 +114,21 @@ function asyncVarValues() {
     });
 }
 
+/* This function checks the value of local data ensure it has a value
+and isn't just 'undefined' */
+function checkLocalData() {
+    getLocalData("language").then((r) => {
+        if (r === undefined) {
+            setLocalData("language", "english");
+        }
+    });
+}
+
 /* ========> Functions <======== */
 /* ========================= End of Functions ================================== */
 
 asyncVarValues();
+checkLocalData();
 
 /* ========================= Event Listeners ================================== */
 
@@ -188,6 +199,7 @@ document.addEventListener("keydown", (event) => {
             setAgentOn(false);
         }
 
+        /* Shift */
         if (event.key === "Shift" && allowShift) {
             // Shifts the summaryLengths array
             shiftArr(summaryLengths, "selected length:");
@@ -242,6 +254,16 @@ document.addEventListener("keydown", (event) => {
                 sendMessage("sidePanel", { purpose: "pauseAgent" });
             }
         }
+
+        /* this is a special key for developers to print certain output */
+        if (event.key === "t") {
+            getLocalData("language").then((r) => console.log("Data: ", r));
+        }
+
+        /* Back tick (`) */
+        if (event.key === "`") {
+            toggleLanguage();
+        }
     }
 
     console.log(timesControlPressed.toString(), screenReaderActive, event.key); // Debugging
@@ -273,6 +295,11 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
             screenReaderEnd(() => {
                 textToSpeech("Press Shift 3 times to access our tutorial");
             });
+        }
+
+        if (key === "language") {
+            language = newValue;
+            console.log("Language set to ", language);
         }
     }
 });

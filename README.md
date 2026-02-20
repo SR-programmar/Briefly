@@ -1,5 +1,3 @@
-# Briefly
-
 ![Alt text](resources/logos/Briefly%20Logo.png)
 
 An app designed to assist the visually impaired in using the internet

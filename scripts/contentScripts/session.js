@@ -22,6 +22,17 @@ async function setActive(state, ttsMsg) {
     setSessionData("extensionActive", state);
 }
 
+// Sets local data by key
+async function setLocalData(key, val) {
+    chrome.storage.local.set({ [key]: val });
+}
+
+// Gets local data by key
+async function getLocalData(key) {
+    let result = await chrome.storage.local.get([key]);
+    return result[key];
+}
+
 /* 
 
 Checks whether session data hasn't been set, is  programmatically set to "None"

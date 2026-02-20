@@ -67,6 +67,9 @@ function handleMessage(message, sender, sendResponse) {
             textToSpeech("Interrupted, now listening");
             screenReaderEnd(() => {
                 startRecognition();
+                if (!timeHandler.checkTimeOut("noResponse")) {
+                    timeHandler.setTime("noResponse", stopAIAgent, 10);
+                }
             });
         }
     }
