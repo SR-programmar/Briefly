@@ -1,8 +1,8 @@
 /*
 
-This javascript file is used to hold a default screenreader
-to use for testing. Summarize.js can return much more human sounding voices,
-but this is built in and won't get rate-limited.
+This javascript file is used to hold our screen reader,
+a software that can read text aloud to the visually impaired
+user.
 
 */
 
@@ -13,7 +13,8 @@ let voices;
 let language;
 let screenReaderPaused = false;
 
-// Sets language to stored value in local storage
+/* Sets local variable 'language' 
+to value associated with language in local storage */
 getLocalData("language").then((result) => {
     language = result;
 });
@@ -28,7 +29,6 @@ async function textToSpeech(givenText) {
         let translatedText = await translateToSpanish(givenText);
         setText(translatedText);
     }
-    console.log(getText());
     synth.speak(screenReader);
 }
 
@@ -55,12 +55,12 @@ function stopScreenreader(msg = "Cancelling screen reader") {
     screenReaderPaused = false;
 }
 
-// Sets screenreader's text
+// Sets the text the screen reader needs to translate
 function setText(text) {
     screenReader.text = text;
 }
 
-// Returns screenreader's text
+// Returns screen reader's text
 function getText() {
     return screenReader.text;
 }
@@ -73,7 +73,7 @@ function screenReaderEnd(callBack) {
     };
 }
 
-// Switches the language to Spanish or English
+// Switches the language to Spanish or English and updates local storage
 async function toggleLanguage() {
     let lang = await getLocalData("language");
     if (lang === "english") {
@@ -94,12 +94,13 @@ async function translateToSpanish(text) {
     common_phrases = { Activated: "activado", Deactivated: "desactivado" };
     if (Object.hasOwn(common_phrases, text)) {
         return common_phrases[text];
+    } else {
+        let translation = await translateToSpanishRequest(text);
+        return translation;
     }
-
-    return text;
 }
 
-// Sets the built-in screenreader to the most human sounding voice
+// Sets the built-in screen reader to the most human sounding voice
 synth.addEventListener("voiceschanged", () => {
     voices = synth.getVoices();
     screenReader.voice = voices[4];

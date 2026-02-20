@@ -129,3 +129,20 @@ async function callAgent(sentences) {
     // Return response from agent
     return json_response.agentResponse;
 }
+
+// Sends text to server to be translated into Spanish, and then sent back
+async function translateToSpanishRequest(text) {
+    const endpoint =
+        "https://summary-chrome-extension-backend.vercel.app/english-to-spanish";
+    // Fetch from server
+    const response = await serverFetch(endpoint, { text: text }).catch(
+        (error) => {
+            console.log(
+                `********\n\nError when fetching from server:\n${error.error}\n\n********`,
+            );
+            return error;
+        },
+    );
+
+    return response.translatedText;
+}

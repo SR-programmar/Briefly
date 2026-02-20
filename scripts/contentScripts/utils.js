@@ -1,10 +1,10 @@
 /* 
-This file includes functions / variables that several files may rely on
+This file includes functions or variables that several files may rely on
 */
 
 const globalHandler = new TimeOutHandler("F2Held");
 
-// Shifts an array
+// Shifts an array but doesn't change its length
 function shiftArr(arr, msg) {
     arr.unshift(arr[arr.length - 1]);
     arr.pop();

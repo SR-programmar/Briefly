@@ -9,13 +9,13 @@ function setSessionData(key, val) {
     chrome.storage.session.set({ [key]: val });
 }
 
-// Sets the session data 'agentActive' to change state across all tabs
+// Sets the state of 'agentActive' to be updated across all tabs
 function setAgentOn(state) {
     agentOn = state;
     setSessionData("agentActive", state);
 }
 
-// Changes session data of 'extensionActive'
+// Sets the state of 'extensionActive' to be updated across all tabs
 async function setActive(state, ttsMsg) {
     textToSpeech(ttsMsg);
     extensionActive = state;
@@ -35,7 +35,7 @@ async function getLocalData(key) {
 
 /* 
 
-Checks whether session data hasn't been set, is  programmatically set to "None"
+Checks whether session data hasn't been set, is  programmatically set to "None",
 or does have a value.
 
 */

@@ -41,7 +41,7 @@ class TimeOutHandler {
         return name in this.timeOuts;
     }
 
-    // Checks if the timeout is undefined or is an ongoing timer
+    // Checks if the timeout is undefined or is an on going timer
     checkTimeOut(name) {
         if (this.checkName(name)) {
             return this.timeOuts[name] != undefined;

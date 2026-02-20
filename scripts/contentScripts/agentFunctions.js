@@ -8,7 +8,7 @@ function navigateTo(url) {
     window.open(url);
 }
 
-// Lists all tabs that are currently opened
+// Lists the title of all tabs that are currently opened
 async function listTabs() {
     const tabs = await sendMessage("service-worker", {
         purpose: "listTabs",
@@ -53,7 +53,8 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
-// Used to interact with an element on the page. Modified to work with navigateTo and openURL
+// Used to interact with an element on the page.
+// Modified to work with navigateTo and openURL
 function clickInteractive(text, args) {
     if (Object.hasOwn(args, "url")) {
         console.log("Args contains url");
