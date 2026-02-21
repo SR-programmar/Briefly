@@ -261,7 +261,7 @@ document.addEventListener("keydown", (event) => {
 
         /* 't' */
         /*
-        this is a special key for developers observe
+        this is a special key for developers to observe
         the value of variables and data
          */
         if (event.key === "t") {

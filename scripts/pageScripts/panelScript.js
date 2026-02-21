@@ -207,13 +207,13 @@ async function afterSpeech() {
             textToSpeech(agentResponse);
             console.log("Agent Response:", agentResponse);
             agentResponse = "";
-            requestSent = false;
         }
         screenReaderEnd(() => {
             startRecognition();
             timeHandler.setTime("noResponse", stopAIAgent, 10);
         });
     }
+    requestSent = false;
     console.log("Request sent: ", requestSent);
     console.log("Agent On: ", agentOn);
 }
@@ -271,5 +271,17 @@ recognition.addEventListener("speechend", () => {
 
 // Adds event listener
 chrome.runtime.onMessage.addListener(handleMessage);
+
+/* This code checks if the session data is updated to immediately update
+the value of local variables */
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        console.log("Key", key);
+        if (key === "language") {
+            language = newValue;
+            console.log("Language set to ", language);
+        }
+    }
+});
 
 /* ========================= End of Event Listeners ================================== */

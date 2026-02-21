@@ -23,6 +23,7 @@ getLocalData("language").then((result) => {
 async function textToSpeech(givenText) {
     synth.cancel();
     if (language === "english") {
+        screenReader.voice = voices[4];
         setText(givenText);
     } else if (language === "spanish") {
         screenReader.voice = voices[7];
@@ -47,10 +48,8 @@ function pauseScreenReader() {
 
 // Stops screen reader
 function stopScreenreader(msg = "Cancelling screen reader") {
-    synth.cancel();
     playStopEffect();
-    setText(msg);
-    synth.speak(screenReader);
+    textToSpeech(msg);
     screenReaderActive = false;
     screenReaderPaused = false;
 }
