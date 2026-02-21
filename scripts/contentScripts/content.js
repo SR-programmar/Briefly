@@ -271,7 +271,9 @@ document.addEventListener("keydown", (event) => {
         /* Back tick (`) */
         // Toggles language between English and Spanish
         if (event.key === "`") {
-            toggleLanguage();
+            if (!screenReaderActive && !agentOn) {
+                toggleLanguage();
+            }
         }
     }
     // Debugging

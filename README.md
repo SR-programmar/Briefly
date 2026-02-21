@@ -63,6 +63,7 @@ This part of the README.md teaches you how to use the extension itself
 - Shift - Changes the length of the summary
 - Capslock - Changes the type of summary
 - Shift x3 - Opens up instructions page with a braille downloadable file
+- Back Tick (`) - Toggles language between English or Spanish
 
 ### AI Agent commands
 
