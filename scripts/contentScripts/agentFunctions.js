@@ -49,7 +49,7 @@ function clickElement(element) {
 // Testing
 document.addEventListener("keydown", (event) => {
     if (event.ctrlKey && event.key === "l") {
-        listTabs();
+        console.log("No test");
     }
 });
 

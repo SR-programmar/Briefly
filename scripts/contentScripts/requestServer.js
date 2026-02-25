@@ -5,6 +5,9 @@ to summarize webpages, and process user requests for the AI Agent.
 
 */
 
+// Specifies which AI Model to use
+const MODEL = "Google";
+
 // Provides a template to fetch data from the server
 async function serverFetch(endpoint, json_obj) {
     return new Promise((resolve, reject) => {
@@ -35,7 +38,7 @@ async function serverFetch(endpoint, json_obj) {
 of the webpage's content that a user is currently on.
 */
 async function summarizeContent(summaryLength, summaryType) {
-    // Endpoint 1 - Weak extractive summarization to avoid rate limits
+    // Endpoint 1 - Used for testing
     const endpoint1 =
         "https://summary-chrome-extension-backend.vercel.app/simple-sum";
 
@@ -48,6 +51,7 @@ async function summarizeContent(summaryLength, summaryType) {
         input: document.body.innerText,
         length: summaryLength,
         sum_type: summaryType,
+        ai_model: MODEL,
     }).catch((error) => {
         console.log(
             `********\n\nError when fetching from server:\n${error.error}\n\n********`,
@@ -96,20 +100,20 @@ async function callAgent(sentences) {
         "https://summary-chrome-extension-backend.vercel.app/agent-call";
 
     // Fetch from server
-    const response = await serverFetch(endpoint2, { input: sentences }).catch(
-        (error) => {
-            console.log(
-                `********\n\nError when fetching from server:\n${error.error}\n\n********`,
-            );
-            return error;
-        },
-    );
+    const response = await serverFetch(endpoint2, {
+        input: sentences,
+        ai_model: MODEL,
+    }).catch((error) => {
+        console.log(
+            `********\n\nError when fetching from server:\n${error.error}\n\n********`,
+        );
+        return error;
+    });
     console.log(response);
     if ("error" in response) {
         return response.agentResponse;
     }
-    // It returns an array so we must specify [0] to get the first object
-    const json_response = JSON.parse(response.response)[0];
+    const json_response = JSON.parse(response.response);
 
     const idx = json_response.index; // Function index
     const args = json_response.arguments; // Arguments if function needs it

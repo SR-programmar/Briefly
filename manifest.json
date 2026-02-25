@@ -29,7 +29,7 @@
                 "scripts/classes/timeOutHandler.js",
                 "scripts/classes/timesPressed.js",
                 "scripts/contentScripts/utils.js",
-                "scripts/contentScripts/session.js",
+                "scripts/contentScripts/storage.js",
                 "scripts/contentScripts/screenReader.js",
                 "scripts/contentScripts/audio.js",
                 "scripts/contentScripts/requestServer.js",

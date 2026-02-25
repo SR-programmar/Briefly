@@ -1,5 +1,7 @@
 ![Alt text](resources/logos/Briefly%20Logo.png)
 
+Logo created in [Canva]("https://www.canva.com/")
+
 An app designed to assist the visually impaired in using the internet
 
 ## Note for judges
