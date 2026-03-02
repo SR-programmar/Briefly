@@ -74,6 +74,12 @@ async function openUrl(url) {
     });
 }
 
+// Sends a message and payload to the current tab
+async function sendContent(payload) {
+    let tab = await getCurrentTab();
+    chrome.tabs.sendMessage(tab.id, { target: "agentFunction", data: payload });
+}
+
 /**
  * End of Agent Function
  */
@@ -82,25 +88,22 @@ async function openUrl(url) {
 function handleMessage(message, sender, sendResponse) {
     if (message.target === "service-worker") {
         const data = message.data;
-        const url = data.url;
-
-        if ("func_message" in data) {
-            if (data.func_message === "listTabs") {
-                listTabs().then((result) => sendResponse({ tabs: result }));
-            }
-        } else {
-            sendResponse({ response: "Not a function message" });
-        }
 
         if ("purpose" in data) {
-            if (data.purpose === "openSidePanel") {
+            const purpose = data.purpose;
+
+            if (purpose === "openSidePanel") {
                 openPanel();
-            } else if (data.purpose === "createNewTab") {
+            } else if (purpose === "listTabs") {
+                listTabs().then((result) => sendResponse({ tabs: result }));
+            } else if (purpose === "createNewTab") {
                 createNewTab(data.url);
-            } else if (data.purpose === "closeCurrentTab") {
+            } else if (purpose === "closeCurrentTab") {
                 closeCurrentTab();
-            } else if (data.purpose === "openUrl") {
+            } else if (purpose === "openUrl") {
                 openUrl(data.url);
+            } else if (purpose === "sendContent") {
+                sendContent(data.payload);
             }
         }
     }

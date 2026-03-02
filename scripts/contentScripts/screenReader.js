@@ -1,20 +1,35 @@
 /*
 
-This javascript file is used to hold a default screenreader
-to use for testing. Summarize.js can return much more human sounding voices,
-but this is built in and won't get rate-limited.
+This javascript file is used to hold our screen reader,
+a software that can read text aloud to the visually impaired
+user.
 
 */
 
 // Variables
 const screenReader = new SpeechSynthesisUtterance();
 const synth = window.speechSynthesis;
+let voices;
+let language;
 let screenReaderPaused = false;
 
+/* Sets local variable 'language' 
+to value associated with language in local storage */
+getLocalData("language").then((result) => {
+    language = result;
+});
+
 // Converts given text to speech
-function textToSpeech(givenText) {
+async function textToSpeech(givenText) {
     synth.cancel();
-    setText(givenText);
+    if (language === "english") {
+        screenReader.voice = voices[4];
+        setText(givenText);
+    } else if (language === "spanish") {
+        screenReader.voice = voices[7];
+        let translatedText = await translateToSpanish(givenText);
+        setText(translatedText);
+    }
     synth.speak(screenReader);
 }
 
@@ -33,20 +48,18 @@ function pauseScreenReader() {
 
 // Stops screen reader
 function stopScreenreader(msg = "Cancelling screen reader") {
-    synth.cancel();
     playStopEffect();
-    setText(msg);
-    synth.speak(screenReader);
+    textToSpeech(msg);
     screenReaderActive = false;
     screenReaderPaused = false;
 }
 
-// Sets screenreader's text
+// Sets the text the screen reader needs to translate
 function setText(text) {
     screenReader.text = text;
 }
 
-// Returns screenreader's text
+// Returns screen reader's text
 function getText() {
     return screenReader.text;
 }
@@ -58,7 +71,36 @@ function screenReaderEnd(callBack) {
         screenReader.onend = undefined;
     };
 }
-// Sets the built-in screenreader to the most human sounding voice
+
+// Switches the language to Spanish or English and updates local storage
+async function toggleLanguage() {
+    let lang = await getLocalData("language");
+    if (lang === "english") {
+        screenReader.voice = voices[7];
+        language = "spanish";
+        textToSpeech("cambiado a español");
+        setLocalData("language", "spanish");
+    } else if (lang === "spanish") {
+        screenReader.voice = voices[4];
+        language = "english";
+        textToSpeech("Switched to English");
+        setLocalData("language", "english");
+    }
+}
+
+// Translates English into Spanish
+async function translateToSpanish(text) {
+    common_phrases = { Activated: "activado", Deactivated: "desactivado" };
+    if (Object.hasOwn(common_phrases, text)) {
+        return common_phrases[text];
+    } else {
+        let translation = await translateToSpanishRequest(text);
+        return translation;
+    }
+}
+
+// Sets the built-in screen reader to the most human sounding voice
 synth.addEventListener("voiceschanged", () => {
-    screenReader.voice = synth.getVoices()[4];
+    voices = synth.getVoices();
+    screenReader.voice = voices[4];
 });

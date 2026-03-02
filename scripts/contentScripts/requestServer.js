@@ -5,6 +5,9 @@ to summarize webpages, and process user requests for the AI Agent.
 
 */
 
+// Specifies which AI Model to use
+const MODEL = "Google";
+
 // Provides a template to fetch data from the server
 async function serverFetch(endpoint, json_obj) {
     return new Promise((resolve, reject) => {
@@ -35,7 +38,7 @@ async function serverFetch(endpoint, json_obj) {
 of the webpage's content that a user is currently on.
 */
 async function summarizeContent(summaryLength, summaryType) {
-    // Endpoint 1 - Weak extractive summarization to avoid rate limits
+    // Endpoint 1 - Used for testing
     const endpoint1 =
         "https://summary-chrome-extension-backend.vercel.app/simple-sum";
 
@@ -48,6 +51,7 @@ async function summarizeContent(summaryLength, summaryType) {
         input: document.body.innerText,
         length: summaryLength,
         sum_type: summaryType,
+        ai_model: MODEL,
     }).catch((error) => {
         console.log(
             `********\n\nError when fetching from server:\n${error.error}\n\n********`,
@@ -64,6 +68,24 @@ async function summarizeContent(summaryLength, summaryType) {
     return response.summary;
 }
 
+/* Calls a function based on AI Agent's JSON object */
+function callAgentFunction(idx, args) {
+    if (idx > -1) {
+        const functions = [navigateTo, openUrl, listTabs, clickInteractive];
+        const indicesURL = [0, 1];
+
+        if (idx === 3) {
+            functions[idx](args.clickElementText, args);
+        } else if (indicesURL.includes(idx)) {
+            functions[idx](args.url);
+        } else {
+            functions[idx]();
+        }
+    } else {
+        console.log("\n*** Function not needed ***\n");
+    }
+}
+
 /* Makes a call to the Python server which sends back a JSON formatted object
 as a response to the user's wish
 */
@@ -78,7 +100,46 @@ async function callAgent(sentences) {
         "https://summary-chrome-extension-backend.vercel.app/agent-call";
 
     // Fetch from server
-    const response = await serverFetch(endpoint2, { input: sentences }).catch(
+    const response = await serverFetch(endpoint2, {
+        input: sentences,
+        ai_model: MODEL,
+    }).catch((error) => {
+        console.log(
+            `********\n\nError when fetching from server:\n${error.error}\n\n********`,
+        );
+        return error;
+    });
+    console.log(response);
+    if ("error" in response) {
+        return response.agentResponse;
+    }
+    const json_response = JSON.parse(response.response);
+
+    const idx = json_response.index; // Function index
+    const args = json_response.arguments; // Arguments if function needs it
+
+    if (Array.isArray(idx)) {
+        for (let i = 0; i < idx.length; i++) {
+            callAgentFunction(idx[i], args);
+        }
+    } else {
+        callAgentFunction(idx, args);
+    }
+
+    // Special string to tell program not to use TextToSpeech()
+    if (idx === 2) {
+        return "no response needed";
+    }
+    // Return response from agent
+    return json_response.agentResponse;
+}
+
+// Sends text to server to be translated into Spanish, and then sent back
+async function translateToSpanishRequest(text) {
+    const endpoint =
+        "https://summary-chrome-extension-backend.vercel.app/english-to-spanish";
+    // Fetch from server
+    const response = await serverFetch(endpoint, { text: text }).catch(
         (error) => {
             console.log(
                 `********\n\nError when fetching from server:\n${error.error}\n\n********`,
@@ -86,28 +147,6 @@ async function callAgent(sentences) {
             return error;
         },
     );
-    console.log(response);
-    if ("error" in response) {
-        return response.agentResponse;
-    }
-    // It returns an array so we must specify [0] to get the first object
-    const json_response = JSON.parse(response.response)[0];
 
-    const idx = json_response.index; // Function index
-    const args = json_response.arguments; // Arguments if function needs it
-
-    if (idx > -1) {
-        const functions = [navigateTo, openUrl, listTabs];
-
-        if (idx === 0 || idx === 1) {
-            functions[idx](args.url);
-        } else {
-            functions[idx]();
-            json_response.agentResponse = "no response needed";
-        }
-    } else {
-        console.log("\n*** Function not needed ***\n");
-    }
-    // Return response from agent
-    return json_response.agentResponse;
+    return response.translatedText;
 }

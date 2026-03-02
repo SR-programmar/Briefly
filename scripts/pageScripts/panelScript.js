@@ -6,6 +6,7 @@ let speechToTextResult;
 let sentences;
 // The state of the AI Agent
 let agentOn = false;
+// Boolean based on if a request is currently pending
 let requestSent = false;
 // The response from the AI Agent given back from the server
 let agentResponse = "";
@@ -13,12 +14,13 @@ let agentResponse = "";
 // Handles timers with the AI Agent and Audio Input system
 let timeHandler = new TimeOutHandler("noResponse, finalResult, fallBack");
 
+// Translates audio into text
 const recognition = createRecognition();
 let agentStartMessage = `Hello, I'm Rosie, your AI Agent. I will answer
 your questions and requests! press escape to stop talking`;
 
 // Returns the status of microphone access
-// Prompt, Granted, or denied
+/* Prompt, Granted, or denied */
 function setMicrophoneAccess() {
     getMicrophoneAccess().then((result) => {
         microphoneAccess = result;
@@ -67,6 +69,9 @@ function handleMessage(message, sender, sendResponse) {
             textToSpeech("Interrupted, now listening");
             screenReaderEnd(() => {
                 startRecognition();
+                if (!timeHandler.checkTimeOut("noResponse")) {
+                    timeHandler.setTime("noResponse", stopAIAgent, 10);
+                }
             });
         }
     }
@@ -109,13 +114,11 @@ function setUpAgent() {
     } else if (microphoneAccess === true) {
         startAIAgent();
     } else if (microphoneAccess === "denied") {
-        textToSpeech(
-            "Uh oh! You've denied Briefly permission, was this a mistake?",
-        );
+        textToSpeech("You have denied Briefly permission, was this a mistake?");
     }
 }
 
-// Creates a Speechrecognition Object
+// Creates a Speech recognition Object
 function createRecognition() {
     const rec = new window.SpeechRecognition();
     rec.language = "en-US";
@@ -131,7 +134,7 @@ async function startAIAgent() {
     await Sleep(500);
     textToSpeech(agentStartMessage);
 
-    // Waits for screenreader to finish before taking in input
+    // Waits for screen reader to finish before taking in input
     screenReaderEnd(() => {
         if (agentOn) {
             agentStartMessage = "Listening";
@@ -143,9 +146,13 @@ async function startAIAgent() {
     });
 }
 
-// Played when AI Agent is cancelled and the user doesn't produce any noise
+/*
+Played when AI Agent is cancelled and no audio is heard from user's
+microphone
+*/
 function stopAIAgent(msg = "Exiting AI Agent") {
     if (agentOn) {
+        requestSent = false;
         setAgentActive(false);
         timeHandler.clearAllTime();
         playStopEffect();
@@ -154,13 +161,13 @@ function stopAIAgent(msg = "Exiting AI Agent") {
     }
 }
 
-// Sets 'agentresponse' to a variable once the server returns a response
+// Sets 'agent response' to a variable once the server returns a response
 async function getAgentResponse() {
     requestSent = true;
 
     let response = await callAgent(sentences).catch((error) => {
         console.log(
-            "********\n\nError when fetching from server:\n${error}\n\n********",
+            `********\n\nError when fetching from server:\n${error}\n\n********`,
         );
         return error;
     });
@@ -168,7 +175,7 @@ async function getAgentResponse() {
     agentResponse = response;
 }
 
-// Called once user has given input
+// Called once user has given input and a prompt has been analyzed
 async function afterSpeech() {
     if (agentOn && !requestSent) {
         getAgentResponse();
@@ -198,14 +205,17 @@ async function afterSpeech() {
         }
         if (agentResponse != "no response needed" && agentOn) {
             textToSpeech(agentResponse);
+            console.log("Agent Response:", agentResponse);
             agentResponse = "";
         }
         screenReaderEnd(() => {
-            requestSent = false;
             startRecognition();
             timeHandler.setTime("noResponse", stopAIAgent, 10);
         });
     }
+    requestSent = false;
+    console.log("Request sent: ", requestSent);
+    console.log("Agent On: ", agentOn);
 }
 
 /* Returns a formatted string of the sentences array to be sent to be
@@ -231,6 +241,8 @@ function toSpeechArray(list) {
 
 /* ========================= Event Listeners ================================== */
 
+// This event listener listens for audio from the user's microphone,
+// converts it into text, and stores it.
 recognition.addEventListener("result", (event) => {
     speechToTextResult = event.results[event.results.length - 1];
     timeHandler.clearTime("noResponse");
@@ -245,18 +257,31 @@ recognition.addEventListener("result", (event) => {
     console.log("Sentences:", sentences);
 });
 
-// This listener is qued when audio is heard
+// This listener is cued when audio is heard
 recognition.addEventListener("speechstart", () => {
     console.log("Started speaking :)");
+    // The conversation can only last up to 15 seconds
     timeHandler.setTime("fallback", afterSpeech, 15);
 });
 
-// This is played when the url stops the microphone
+// This is played when the user hasn't provided any audio input
 recognition.addEventListener("speechend", () => {
     console.log("Finished speaking :)");
 });
 
 // Adds event listener
 chrome.runtime.onMessage.addListener(handleMessage);
+
+/* This code checks if the session data is updated to immediately update
+the value of local variables */
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
+        console.log("Key", key);
+        if (key === "language") {
+            language = newValue;
+            console.log("Language set to ", language);
+        }
+    }
+});
 
 /* ========================= End of Event Listeners ================================== */

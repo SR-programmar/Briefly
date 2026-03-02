@@ -1,7 +1,7 @@
 /*
 
-This file includes functions that panelScript needs
-function properly
+This file includes extra functions that panel script needs.
+The purpose of this file is to keep panelScript clean.
 
 */
 
