@@ -6,7 +6,7 @@ to summarize webpages, and process user requests for the AI Agent.
 */
 
 // Specifies which AI Model to use
-const MODEL = "Google";
+const MODEL = "OpenAI";
 
 // Provides a template to fetch data from the server
 async function serverFetch(endpoint, json_obj) {
@@ -51,7 +51,7 @@ async function summarizeContent(summaryLength, summaryType) {
         input: document.body.innerText,
         length: summaryLength,
         sum_type: summaryType,
-        ai_model: MODEL,
+        ai_model: "Google",
     }).catch((error) => {
         console.log(
             `********\n\nError when fetching from server:\n${error.error}\n\n********`,
