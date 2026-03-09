@@ -208,7 +208,8 @@ document.addEventListener("keydown", (event) => {
             shiftArr(summaryLengths, "selected length:");
             timesShiftPressed.add();
             if (timesShiftPressed.conditionMet()) {
-                textToSpeech("Opening Tutorial Tab");
+                shiftArr(summaryLengths, "");
+                textToSpeech("Opening tutorial tab");
                 sendMessage("service-worker", {
                     purpose: "createNewTab",
                     url: "pages/instructions.html",

@@ -12,7 +12,6 @@ const synth = window.speechSynthesis;
 let voices;
 let language;
 let screenReaderPaused = false;
-
 /* Sets local variable 'language' 
 to value associated with language in local storage */
 getLocalData("language").then((result) => {
@@ -28,8 +27,13 @@ async function textToSpeech(givenText) {
     } else if (language === "spanish") {
         screenReader.voice = voices[7];
         let translatedText = await translateToSpanish(givenText);
-        setText(translatedText);
+
+        synth.cancel();
+        if (language === "spanish") {
+            setText(translatedText);
+        }
     }
+    console.log("Screen Reader", getText());
     synth.speak(screenReader);
 }
 
